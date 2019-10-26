@@ -8,7 +8,7 @@ namespace Dominio
 {
     class Mensaje
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public Usuario Emisor { get; set; }
         public Usuario Receptor { get; set; }
         public string Texto { get; set; }

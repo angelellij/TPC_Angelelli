@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Dominio;
+using Negocio;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,30 +12,33 @@ namespace WebAPI.Controllers
     public class TagsController : ApiController
     {
         // GET: api/Tags
-        public IEnumerable<string> Get()
+        public IEnumerable<Tag> GetAll()
         {
-            return new string[] { "value1", "value2" };
+            return (IEnumerable<Tag>)new TagNegocio().getAll();
         }
 
         // GET: api/Tags/5
-        public string Get(int id)
+        public int Get(int id)
         {
-            return "value";
+            return id;
         }
 
         // POST: api/Tags
-        public void Post([FromBody]string value)
+        public void Post([FromBody]Object value)
         {
+            new TagNegocio().create((Tag)value);
         }
 
         // PUT: api/Tags/5
-        public void Put(int id, [FromBody]string value)
+        public void Put([FromBody]Object value, [FromBody]Object value2)
         {
+            new TagNegocio().update((Tag)value, (Tag)value2);
         }
 
         // DELETE: api/Tags/5
-        public void Delete(int id)
+        public void Delete([FromBody]Object value)
         {
+            new TagNegocio().delete((Tag)value);
         }
     }
 }

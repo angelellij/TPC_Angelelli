@@ -8,7 +8,7 @@ namespace Dominio
 {
     class Post
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public Espacio Espacio { get; set; }
         public Usuario Usuario { get; set; }
         public string Titulo { get; set; }
