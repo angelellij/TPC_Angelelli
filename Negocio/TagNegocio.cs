@@ -12,14 +12,14 @@ namespace Negocio
     {
         private String root = "tags";
         private Db db = new Db();
-        private Tag FirebaseToTag(FirebaseObject<Tag> tagAux)
+        private Tag FirebaseObjectToObject(FirebaseObject<Tag> tagAux)
         {
             Tag tag = new Tag();
-            tag.id = tagAux.Key;
-            tag.nombre = tagAux.Object.nombre;
-            tag.espacio = tagAux.Object.espacio;
-            tag.colorLetra = tagAux.Object.colorLetra;
-            tag.colorBackground = tagAux.Object.colorBackground;
+            tag.Id = tagAux.Key;
+            tag.Nombre = tagAux.Object.Nombre;
+            tag.Espacio = tagAux.Object.Espacio;
+            tag.ColorLetra = tagAux.Object.ColorLetra;
+            tag.ColorBackground = tagAux.Object.ColorBackground;
             return tag;
         }
         public async Task<List<Tag>> getAll()
@@ -31,7 +31,7 @@ namespace Negocio
 
             foreach (var tagAux in tagsAux)
             {
-                tags.Add(FirebaseToTag(tagAux)); 
+                tags.Add(FirebaseObjectToObject(tagAux)); 
             }
 
             return tags;
@@ -48,14 +48,14 @@ namespace Negocio
 
                 foreach (var tagAux in tagsAux)
                 {
-                    tag = FirebaseToTag(tagAux);
+                    tag = FirebaseObjectToObject(tagAux);
                 }
                 return tag;
             }
 
             public async Task create(Tag tag)
         {
-            tag.id = null;
+            tag.Id = null;
             var result = await db.Client()
           .Child(root)
           .PostAsync(tag);
@@ -63,7 +63,7 @@ namespace Negocio
       
         public async Task update (string id, Tag tag)
         {
-            tag.id = null;
+            tag.Id = null;
             await db.Client()
             .Child(root)
             .Child(id)

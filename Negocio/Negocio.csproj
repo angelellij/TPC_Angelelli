@@ -219,6 +219,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EspacioNegocio.cs" />
     <Compile Include="NoticiaNegocio.cs" />
     <Compile Include="Db.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
