@@ -15,6 +15,6 @@ namespace Dominio
         public string Descripcion { get; set; }
         public Tag Tag { get; set; }
         public string Date { get; set; }
-        public bool deleted { get; set; }
+        public bool Deleted { get; set; }
     }
 }

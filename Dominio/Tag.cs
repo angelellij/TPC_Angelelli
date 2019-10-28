@@ -8,11 +8,11 @@ namespace Dominio
 {
     public class Tag
     {
-        public string id { get; set; }
-        public string espacio { get; set; }
-        public string nombre { get; set; }
-        public string colorLetra { get; set; }
-        public string  colorBackground { get; set; }
+        public string Id { get; set; }
+        public string Espacio { get; set; }
+        public string Nombre { get; set; }
+        public string ColorLetra { get; set; }
+        public string ColorBackground { get; set; }
 
     }
 }

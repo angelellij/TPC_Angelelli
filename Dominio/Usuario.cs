@@ -12,7 +12,9 @@ namespace Dominio
         public string Nombre { get; set; }
         public string Apellido { get; set; }
         public string Email{ get; set; }
+        public string Contrasena { get; set; }
         public string FNacimiento { get; set; }
+        public string Espacios { get; set; }
         public string UrlFoto { get; set; }
         public string TimestampUtc { get; set; }
 

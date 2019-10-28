@@ -1,10 +1,12 @@
 ﻿using Dominio;
+using Firebase.Database;
 using Negocio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebAPI.Controllers
@@ -12,33 +14,33 @@ namespace WebAPI.Controllers
     public class TagsController : ApiController
     {
         // GET: api/Tags
-        public IEnumerable<Tag> GetAll()
+        public Task<List<Tag>> GetAll()
         {
-            return (IEnumerable<Tag>)new TagNegocio().getAll();
+            return new TagNegocio().getAll();
         }
 
-        // GET: api/Tags/5
-        public int Get(int id)
+        // GET: api/Tags/stringId
+        public Task<Tag> Get(string id)
         {
-            return id;
+            return new TagNegocio().getTag(id);
         }
 
         // POST: api/Tags
-        public void Post([FromBody]Object value)
+        public async void Post([FromBody]Tag value)
         {
-            new TagNegocio().create((Tag)value);
+                new TagNegocio().create(value);          
         }
 
-        // PUT: api/Tags/5
-        public void Put([FromBody]Object value, [FromBody]Object value2)
+        // PUT: api/Tags/stringId
+        public void Put(string id, [FromBody]Tag tag)
         {
-            new TagNegocio().update((Tag)value, (Tag)value2);
+            new TagNegocio().update(id, tag);
         }
 
-        // DELETE: api/Tags/5
-        public void Delete([FromBody]Object value)
+        // DELETE: api/Tags/stringId
+        public void Delete(string value)
         {
-            new TagNegocio().delete((Tag)value);
+            new TagNegocio().delete(value);
         }
     }
 }

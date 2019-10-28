@@ -8,11 +8,13 @@ namespace Dominio
 {
     public class Espacio
     {
-        public String Id { get; set; }
+        public string Id { get; set; }
         public List<string> UrlEspacio { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
+        public List<Usuario> Miembros { get;set; }
+        public List<Usuario> Usuarios { get; set; }
         public string Date { get; set; }
-        public bool deleted { get; set; }
+        public bool Deleted { get; set; }
     }
 }
