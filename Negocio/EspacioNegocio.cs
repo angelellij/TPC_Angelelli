@@ -94,20 +94,20 @@ namespace Negocio
             
         }
 
-        public async Task update(string id, Espacio tag)
+        public async Task update(string url, Espacio espacio)
         {
-            tag.Id = null;
+            espacio.Id = null;
             await db.Client()
             .Child(root)
-            .Child(id)
-            .PutAsync(tag);
+            .Child(url)
+            .PutAsync(espacio);
         }
 
-        public async Task delete(string id)
+        public async Task delete(string url)
         {
             await db.Client()
               .Child(root)
-              .Child(id)
+              .Child(url)
               .DeleteAsync();
         }
 

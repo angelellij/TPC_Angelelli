@@ -16,5 +16,13 @@ namespace Dominio
         public List<Usuario> Administradores { get; set; }
         public string Date { get; set; }
         public bool Deleted { get; set; }
+
+        public string getUrlEspacio()
+        {
+            string UrlEspacioFull = "Espacios";
+            if (UrlEspacio != null){ UrlEspacioFull = UrlEspacioFull + "/" + UrlEspacio; }
+            UrlEspacioFull = UrlEspacioFull + "/" + Id;
+            return UrlEspacioFull;
+        }
     }
 }

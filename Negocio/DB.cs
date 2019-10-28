@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Firebase.Database;
 using Firebase.Auth;
+using Firebase.Database.Query;
 
 namespace Negocio
 {
@@ -30,6 +31,13 @@ namespace Negocio
             return new FirebaseAuthProvider(new FirebaseConfig(this.apiKey));
         }
         
-
+        public async Task CreateInUrl(object obj, string url)
+        {
+            var result = await Client()
+          .Child(url)
+          .PostAsync(obj);
+            return;
+         }
+        
     }
 }

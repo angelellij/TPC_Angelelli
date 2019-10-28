@@ -26,9 +26,9 @@ namespace WebAPI.Controllers
         }
 
         // POST: api/Tags
-        public async void Post([FromBody]Tag value)
+        public void Post([FromBody]Tag value)
         {
-                new TagNegocio().create(value);          
+               new TagNegocio().create(value);          
         }
 
         // PUT: api/Tags/stringId

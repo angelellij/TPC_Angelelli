@@ -37,6 +37,21 @@ namespace Negocio
             return tags;
         }
 
+        public async Task<List<Tag>> getAllFromEspacio(string urlEspacio)
+        {
+            List<Tag> tags = new List<Tag>();
+            var tagsAux = await db.Client()
+           .Child(urlEspacio + "/" + root)
+           .OnceAsync<Tag>();
+
+            foreach (var tagAux in tagsAux)
+            {
+                tags.Add(FirebaseObjectToObject(tagAux));
+            }
+
+            return tags;
+        }
+
             public async Task<Tag> getTag(string id)
             {
                 Tag tag = new Tag();
@@ -53,13 +68,27 @@ namespace Negocio
                 return tag;
             }
 
-            public async Task create(Tag tag)
+        public async void create(Tag tag)
         {
-            tag.Id = null;
-            var result = await db.Client()
-          .Child(root)
-          .PostAsync(tag);
+           var result = db.CreateInUrl(tag.ReturnSmallTag(), root);
+            var result2 = db.CreateInUrl(tag, tag.Espacio.getUrlEspacio() + "/" + root);
+            result.Wait();
+            result2.Wait();
+
         }
+           /* public async Task createInFirebase(Tag tag, string url)
+        {
+            Tag smallTag = new Tag();
+            smallTag.setSmallTag(tag);
+
+            var result = await db.Client()
+          .Child(url)
+          .PostAsync(smallTag);
+
+            var result = await db.Client()
+          .Child(tag.Espacio.getUrlEspacio()+ "/" + root)
+          .PostAsync(tag);
+        }*/
       
         public async Task update (string id, Tag tag)
         {
