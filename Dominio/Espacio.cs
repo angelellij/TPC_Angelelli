@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Firebase.Database;
 
 namespace Dominio
 {
@@ -17,12 +18,24 @@ namespace Dominio
         public string Date { get; set; }
         public bool Deleted { get; set; }
 
-        public string getUrlEspacio()
+        public string GetUrlEspacio()
         {
             string UrlEspacioFull = "Espacios";
             if (UrlEspacio != null){ UrlEspacioFull = UrlEspacioFull + "/" + UrlEspacio; }
             UrlEspacioFull = UrlEspacioFull + "/" + Id;
             return UrlEspacioFull;
+        }
+        public Espacio() { }
+        public Espacio(FirebaseObject<Espacio> espacio)
+        {
+            Id = espacio.Key;
+            Nombre = espacio.Object.Nombre;
+            Descripcion = espacio.Object.Descripcion;
+            UrlEspacio = espacio.Object.UrlEspacio;
+            Miembros = espacio.Object.Miembros;
+            Administradores = espacio.Object.Administradores;
+            Date = espacio.Object.Date;
+            Deleted = espacio.Object.Deleted;
         }
     }
 }

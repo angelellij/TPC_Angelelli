@@ -220,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EspacioNegocio.cs" />
+    <Compile Include="FireUrl.cs" />
     <Compile Include="NoticiaNegocio.cs" />
     <Compile Include="Db.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

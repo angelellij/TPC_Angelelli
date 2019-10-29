@@ -26,7 +26,7 @@ namespace WebAPI.Controllers
         // POST: api/Usuarios
         public async void Post([FromBody]Usuario usuario)
         {
-            await new UsuarioNegocio().create(usuario); 
+            await new UsuarioNegocio().Create(usuario); 
 
         }
 

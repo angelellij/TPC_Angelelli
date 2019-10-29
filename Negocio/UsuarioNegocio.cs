@@ -11,17 +11,17 @@ namespace Negocio
 {
     public class UsuarioNegocio
     {
-        private String root = "usuarios";
-        private Db db = new Db();
-        public async Task<Usuario> create(Usuario usuario) {
+        private string Root { get; } = "usuarios";
+        private Db Db { get; } = new Db();
+        public async Task<Usuario> Create(Usuario usuario) {
 
-            var authProvider = db.FirebaseNewUser();
+            var authProvider = Db.FirebaseNewUser();
             // var facebookAccessToken = "<login with facebook and get oauth access token>";
 
             var auth = await authProvider.CreateUserWithEmailAndPasswordAsync(usuario.Email, usuario.Contrasena);
            
             var firebase = new FirebaseClient(
-              db.databaseURL,
+              Db.DatabaseURL,
               new FirebaseOptions
               {
                   AuthTokenAsyncFactory = () => Task.FromResult(auth.FirebaseToken)

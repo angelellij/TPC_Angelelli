@@ -10,101 +10,70 @@ namespace Negocio
 {
     public class TagNegocio
     {
-        private String root = "tags";
-        private Db db = new Db();
-        private Tag FirebaseObjectToObject(FirebaseObject<Tag> tagAux)
-        {
-            Tag tag = new Tag();
-            tag.Id = tagAux.Key;
-            tag.Nombre = tagAux.Object.Nombre;
-            tag.Espacio = tagAux.Object.Espacio;
-            tag.ColorLetra = tagAux.Object.ColorLetra;
-            tag.ColorBackground = tagAux.Object.ColorBackground;
-            return tag;
-        }
-        public async Task<List<Tag>> getAll()
+        private FireUrl Url { get; set; } = new FireUrl("Tags");
+        private Db Db { get; } = new Db();
+       
+        public async Task<List<Tag>> GetAll()
         {
             List<Tag> tags = new List<Tag>();
-               var tagsAux = await db.Client()
-              .Child(root)
+               var tagsAux = await Db.Client()
+              .Child(Url.Root)
               .OnceAsync<Tag>();
 
             foreach (var tagAux in tagsAux)
             {
-                tags.Add(FirebaseObjectToObject(tagAux)); 
+                tags.Add(new Tag(tagAux)); 
             }
 
             return tags;
         }
 
-        public async Task<List<Tag>> getAllFromEspacio(string urlEspacio)
+        public async Task<List<Tag>> GetAllFromEspacio(string urlEspacio)
         {
             List<Tag> tags = new List<Tag>();
-            var tagsAux = await db.Client()
-           .Child(urlEspacio + "/" + root)
+            var tagsAux = await Db.Client()
+           .Child(urlEspacio + "/" + Url.Root)
            .OnceAsync<Tag>();
 
             foreach (var tagAux in tagsAux)
             {
-                tags.Add(FirebaseObjectToObject(tagAux));
+                tags.Add(new Tag(tagAux));
             }
 
             return tags;
         }
 
-            public async Task<Tag> getTag(string id)
+            public async Task<Tag> GetObject(string id)
             {
                 Tag tag = new Tag();
-                var tagsAux = await db.Client()
-               .Child(root)
+                var tagsAux = await Db.Client()
+               .Child(Url.Root)
                .OrderByKey()
                .EqualTo(id)
                .OnceAsync<Tag>();
 
                 foreach (var tagAux in tagsAux)
                 {
-                    tag = FirebaseObjectToObject(tagAux);
+                    tag = new Tag(tagAux);
                 }
                 return tag;
             }
 
-        public async void create(Tag tag)
+        public async Task Create(Tag tag)
         {
-           var result = db.CreateInUrl(tag.ReturnSmallTag(), root);
-            var result2 = db.CreateInUrl(tag, tag.Espacio.getUrlEspacio() + "/" + root);
-            result.Wait();
-            result2.Wait();
-
+           await Db.Create(tag.ReturnSmallTag(), Url.Root);
+           await Db.Create(tag, Url.GetRootUrlFromKey(tag.Espacio.GetUrlEspacio()));
         }
-           /* public async Task createInFirebase(Tag tag, string url)
-        {
-            Tag smallTag = new Tag();
-            smallTag.setSmallTag(tag);
-
-            var result = await db.Client()
-          .Child(url)
-          .PostAsync(smallTag);
-
-            var result = await db.Client()
-          .Child(tag.Espacio.getUrlEspacio()+ "/" + root)
-          .PostAsync(tag);
-        }*/
       
-        public async Task update (string id, Tag tag)
+        public async Task Update (string id, Tag tag)
         {
             tag.Id = null;
-            await db.Client()
-            .Child(root)
-            .Child(id)
-            .PutAsync(tag);
+            await Db.Update(tag, Url.GetRootUrlFromKey(id));
         }
 
-        public async Task delete (string id)
+        public async Task Delete (string id)
         {
-            await db.Client()
-              .Child(root)
-              .Child(id)
-              .DeleteAsync();
+            await Db.Delete(Url.GetRootUrlFromKey(id));
         }
 
     }

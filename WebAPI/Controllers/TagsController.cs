@@ -16,31 +16,31 @@ namespace WebAPI.Controllers
         // GET: api/Tags
         public Task<List<Tag>> GetAll()
         {
-            return new TagNegocio().getAll();
+            return new TagNegocio().GetAll();
         }
 
         // GET: api/Tags/stringId
         public Task<Tag> Get(string id)
         {
-            return new TagNegocio().getTag(id);
+            return new TagNegocio().GetObject(id);
         }
 
         // POST: api/Tags
-        public void Post([FromBody]Tag value)
+        public async void Post([FromBody]Tag value)
         {
-               new TagNegocio().create(value);          
+              await new TagNegocio().Create(value);
         }
 
         // PUT: api/Tags/stringId
-        public void Put(string id, [FromBody]Tag tag)
+        public async void Put(string id, [FromBody]Tag tag)
         {
-            new TagNegocio().update(id, tag);
+            await new TagNegocio().Update(id, tag);
         }
 
         // DELETE: api/Tags/stringId
-        public void Delete(string value)
+        public async void Delete(string value)
         {
-            new TagNegocio().delete(value);
+            await new TagNegocio().Delete(value);
         }
     }
 }

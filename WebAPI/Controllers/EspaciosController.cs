@@ -13,33 +13,33 @@ namespace WebAPI.Controllers
     public class EspaciosController : ApiController
     {
         // GET: api/Tags
-        public Task<List<Espacio>> GetAll()
+        public async Task<List<Espacio>> GetAll()
         {
-            return new EspacioNegocio().getAll();
+            return await new EspacioNegocio().GetAll();
         }
 
         // GET: api/Tags/stringId
         public Task<Espacio> Get(string id)
         {
-            return new EspacioNegocio().getObject(id);
+            return new EspacioNegocio().GetObject(id);
         }
 
         // POST: api/Tags
-        public async void Post([FromBody]Espacio value)
+        public async Task Post([FromBody]Espacio value)
         {
-            new EspacioNegocio().create(value);
+            await new EspacioNegocio().Create(value);
         }
 
         // PUT: api/Tags/stringId
-        public void Put(string id, [FromBody]Espacio espacio)
+        public async void Put(string id, [FromBody]Espacio espacio)
         {
-            new EspacioNegocio().update(id, espacio);
+            await new EspacioNegocio().Update(id, espacio);
         }
 
         // DELETE: api/Tags/stringId
-        public void Delete(string value)
+        public async void Delete(string value)
         {
-            new EspacioNegocio().delete(value);
+            await new EspacioNegocio().Delete(value);
         }
     }
 }

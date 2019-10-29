@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Firebase.Database;
 
 namespace Dominio
 {
@@ -13,14 +14,28 @@ namespace Dominio
         public string Nombre { get; set; }
         public string ColorLetra { get; set; }
         public string ColorBackground { get; set; }
+        public Tag() { }
+        public Tag(FirebaseObject<Tag> tag)
+        {
+                Id = tag.Key;
+                Nombre = tag.Object.Nombre;
+                Espacio = tag.Object.Espacio;
+                ColorLetra = tag.Object.ColorLetra;
+                ColorBackground = tag.Object.ColorBackground;
+        }
 
         public Tag ReturnSmallTag()
         {
-            Tag smallTag = new Tag();
-            smallTag.Nombre = Nombre;
-            smallTag.Espacio = new Espacio();
-            smallTag.Espacio.Id = Espacio.Id;
-            smallTag.Espacio.UrlEspacio = Espacio.UrlEspacio;
+            Tag smallTag = new Tag
+            {
+                Nombre = Nombre,
+                Espacio = new Espacio()
+                {
+                   Id = Espacio.Id,
+                   UrlEspacio = Espacio.UrlEspacio
+        }
+            };
+           
             return smallTag;
         }
     }
