@@ -27,11 +27,12 @@ namespace Negocio
         return new FirebaseClient(DatabaseURL);
         }
         
-        public async Task Create(object obj, string url)
+        public async Task<FirebaseObject<object>> Create(object obj, string url)
         {
-            await Client()
+           var x = await Client()
           .Child(url)
           .PostAsync(obj);
+            return x;
          }
 
         public async Task Update(object obj, string url)
@@ -46,6 +47,17 @@ namespace Negocio
             await Client()
             .Child(url)
             .DeleteAsync();
+        }
+
+        public async Task<FirebaseObject<object>> GetAllFromUrl(string Url, string Key)
+        {
+            var x = await Client()
+              .Child(Url)
+              .OrderByKey()
+              .EqualTo(Key)
+              .OnceSingleAsync<object>();
+            return (FirebaseObject<object>) x;
+
         }
 
 

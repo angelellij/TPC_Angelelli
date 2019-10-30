@@ -223,6 +223,7 @@
     <Compile Include="FireUrl.cs" />
     <Compile Include="NoticiaNegocio.cs" />
     <Compile Include="Db.cs" />
+    <Compile Include="PostNegocio.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TagNegocio.cs" />
     <Compile Include="UsuarioNegocio.cs" />

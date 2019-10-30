@@ -22,11 +22,12 @@ namespace Negocio
         }
         public string GetUrlFromList(List<string> Keys)
         {
-            string url = "";
-            foreach (string Key in Keys)
+            string url = Keys[0];
+            for (int i = 1; i < Keys.Count(); i++)
             {
-                url = url + "/" + Key;
+                url = url + "/" + Keys[i];
             }
+            url = url.Replace("-","");
             return url;
         }
         public List<string> GetUrlList(string Url)
@@ -71,5 +72,22 @@ namespace Negocio
             return Url + "/" + Key;
         }
 
+        public string RootInOneEspacio(string UrlEspacio, string EspacioKey)
+        {
+            return AddKeyToUrl(Espacios,
+                       AddKeyToUrl(GetUrlFromList(GetUrlList(UrlEspacio)),
+                            AddKeyToUrl(EspacioKey, 
+                                Root)));
+        }
+        public string RootInOneUsuario(string KeyUsuario)
+        {
+            return AddKeyToUrl(Usuarios,
+                       AddKeyToUrl(ConvertSavedUrlToFireUrl(KeyUsuario),
+                                Root));
+        }
+        public string ConvertSavedUrlToFireUrl(string SavedUrl)
+        {
+            return GetUrlFromList(GetUrlList(SavedUrl));
+        }
     }
 }

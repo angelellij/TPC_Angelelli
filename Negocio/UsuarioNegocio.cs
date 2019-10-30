@@ -12,7 +12,7 @@ namespace Negocio
 {
     public class UsuarioNegocio
     {
-        private FireUrl Url { get; set; } = new FireUrl("Usuarios");
+        private FireUrl Url { get; set; } = new FireUrl("usuarios");
         private Db Db { get; } = new Db();
         public async Task<string> FirebaseNewUser(Usuario usuario)
         {
@@ -80,15 +80,18 @@ namespace Negocio
             {
                 await Db.Update(usuario, Url.GetRootUrlFromKey(key));
                 int i = 0;
-                foreach (Espacio espacio in usuario.ListadoEspacios)
+                if (usuario.ListadoEspacios != null)
                 {
-                    await Db.Update(
-                        usuario.ReturnSmallUsuario(),
-                        Url.AddKeyToUrl("Espacios",
-                            Url.AddKeyToUrl(usuario.ListadoEspacios[i].GetUrlEspacio(),
-                                Url.AddKeyToUrl(Url.GetRootUrlFromKey(usuario.ListadoEspacios[i].Id),
-                                    key))));
-                    i++;
+                    foreach (Espacio espacio in usuario.ListadoEspacios)
+                    {
+                        await Db.Update(
+                            usuario.ReturnSmallUsuario(),
+                            Url.AddKeyToUrl("Espacios",
+                                Url.AddKeyToUrl(usuario.ListadoEspacios[i].GetUrlEspacio(),
+                                    Url.AddKeyToUrl(Url.GetRootUrlFromKey(usuario.ListadoEspacios[i].Id),
+                                        key))));
+                        i++;
+                    }
                 }
             }
         }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
-    public class NoticiaController : ApiController
+    public class NoticiasController : ApiController
     {
         // GET: api/Noticia
         public async Task<List<Noticia>> Get()

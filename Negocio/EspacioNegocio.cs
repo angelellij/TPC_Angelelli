@@ -11,7 +11,7 @@ namespace Negocio
 {
     public class EspacioNegocio
     {
-        private FireUrl Url { get; } = new FireUrl("Espacios");
+        private FireUrl Url { get; } = new FireUrl("espacios");
         private Db Db { get; } = new Db();
         public async Task<List<Espacio>> GetAll()
         {
