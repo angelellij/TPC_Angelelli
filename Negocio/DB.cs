@@ -13,9 +13,9 @@ namespace Negocio
     {
         // Your web app's Firebase configuration
 
-        private string ApiKey { get; } = "AIzaSyAm-ccnoaXQ3XtvHpVQ5KL_rYBDqs27hNk";
-        public string AuthDomain = "comuni-82642.firebaseapp.com";
-        public string  DatabaseURL = "https://comuni-82642.firebaseio.com";
+        public string ApiKey { get; } = "AIzaSyAm-ccnoaXQ3XtvHpVQ5KL_rYBDqs27hNk";
+        public string AuthDomain { get; } = "comuni-82642.firebaseapp.com";
+        public string DatabaseURL { get; } = "https://comuni-82642.firebaseio.com";
        /* private string projectId = "comuni-82642";
         private string storageBucket = "comuni-82642.appspot.com";
         private string messagingSenderId = "540231429972";
@@ -26,14 +26,10 @@ namespace Negocio
         {
         return new FirebaseClient(DatabaseURL);
         }
-        public FirebaseAuthProvider FirebaseNewUser()
-        {
-            return new FirebaseAuthProvider(new FirebaseConfig(this.ApiKey));
-        }
         
         public async Task Create(object obj, string url)
         {
-           await Client()
+            await Client()
           .Child(url)
           .PostAsync(obj);
          }

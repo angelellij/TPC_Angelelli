@@ -26,17 +26,12 @@ namespace Dominio
 
         public Tag ReturnSmallTag()
         {
-            Tag smallTag = new Tag
+            return new Tag
             {
+                Id = Id,
                 Nombre = Nombre,
-                Espacio = new Espacio()
-                {
-                   Id = Espacio.Id,
-                   UrlEspacio = Espacio.UrlEspacio
-        }
+                Espacio = Espacio.ReturnSmallEspacio()       
             };
-           
-            return smallTag;
         }
     }
 }

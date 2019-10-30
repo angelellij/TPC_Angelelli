@@ -28,7 +28,6 @@ namespace Negocio
                     var espaciosx = await Db.Client()
                                    .Child(urlEspacios[0])
                                    .OnceAsync<Espacio>();
-
                     foreach (var espaciox in espaciosx)
                     {
                         urlEspacios.Add(Url.AddKeyToUrl(urlEspacios[0], espaciox.Key));

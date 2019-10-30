@@ -10,45 +10,52 @@ namespace Negocio
 {
     public class NoticiaNegocio
     {
-        private String root = "noticias";
-        private Db db = new Db();
-        public async Task<List<Noticia>> getAll()
+        private FireUrl Url { get; } = new FireUrl("noticias");
+        private Db Db { get; } = new Db();
+        public async Task<List<Noticia>> GetAll()
         {
             List<Noticia> noticias = new List<Noticia>();
 
-            var noticiasAux = await db.Client()
-              .Child(root)
+            var espaciosAux = await Db.Client()
+              .Child(Url.Espacios)
+              .OnceAsync<Espacio>();
+
+            foreach (var espaciox in espaciosAux)
+            {
+                var noticiasAux = await Db.Client()
+              .Child(Url.AddKeyToUrl(Url.Espacios,
+                    Url.AddKeyToUrl(espaciox.Key,Url.Root)
+                    ))
               .OnceAsync<Noticia>();
 
-            foreach (var noticia in noticiasAux)
-            {
-                noticias.Add((Noticia)noticia.Object);
+                foreach (var noticia in noticiasAux)
+                {
+                    noticias.Add(new Noticia(noticia));
+                }
             }
-
             return noticias;
         }
-
-        public async void create(Noticia noticia)
+       
+        public async Task Create(Noticia noticia)
         {
-            var result = await db.Client()
-          .Child(root)
-          .PostAsync(noticia);
+            await Db.Create(noticia.ReturnNoticiaFire(),
+                Url.AddKeyToUrl(Url.Espacios,
+                    Url.AddKeyToUrl(noticia.Espacio.Id,
+                        Url.Root)
+                    ));
         }
 
-        public async void update(Noticia noticiaAGuardar, Noticia noticiaACambiar)
+        public async Task Update(Noticia Noticia, string url)
         {
-            await db.Client()
-            .Child(root)
-            .Child(noticiaAGuardar.Id)
-            .PutAsync(noticiaACambiar);
+            await Db.Update(Noticia, 
+                Url.AddKeyToUrl(Url.Espacios,
+                    Url.AddKeyToUrl(url,Url.Root)
+                    ));
         }
 
-        public async void delete(Noticia noticia)
+        public async Task Delete(string url)
         {
-            await db.Client()
-              .Child(root)
-              .Child(noticia.Id)
-              .DeleteAsync();
+            await Db.Delete(url);
         }
 
     }

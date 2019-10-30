@@ -37,5 +37,15 @@ namespace Dominio
             Date = espacio.Object.Date;
             Deleted = espacio.Object.Deleted;
         }
+
+        public Espacio ReturnSmallEspacio()
+        {
+            return new Espacio
+            {
+                Id = this.Id,
+                UrlEspacio = this.UrlEspacio,
+                Nombre = this.Nombre
+            };
+        }
     }
 }

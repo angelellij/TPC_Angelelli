@@ -6,38 +6,40 @@ using System.Net.Http;
 using System.Web.Http;
 using Negocio;
 using Dominio;
+using System.Threading.Tasks;
 
 namespace WebAPI.Controllers
 {
     public class NoticiaController : ApiController
     {
         // GET: api/Noticia
-        public IEnumerable<Noticia> Get()
+        public async Task<List<Noticia>> Get()
         {
-            return (IEnumerable<Noticia>)new NoticiaNegocio().getAll();
+            return await new NoticiaNegocio().GetAll();
         }
 
         // GET: api/Noticia/5
-        /*public string Get(int id)
+        public string Get(string id)
         {
             return "value";
         }
-*/
+
         // POST: api/Noticia
-        public void Post([FromBody]Noticia noticia)
+        public async Task Post([FromBody]Noticia noticia)
         {
-            new NoticiaNegocio().create(noticia);
+            await new NoticiaNegocio().Create(noticia);
         }
 
         // PUT: api/Noticia/5
-        public void Put([FromBody]Noticia noticia, [FromBody]Noticia noticia2)
+        public async Task Put([FromBody]Noticia noticia, string id)
         {
-            new NoticiaNegocio().update(noticia, noticia2);
+            await new NoticiaNegocio().Update(noticia, id);
         }
 
         // DELETE: api/Noticia/5
-        public void Delete(int id)
+        public async Task Delete(string id)
         {
+            await new NoticiaNegocio().Delete(id);
         }
     }
 }

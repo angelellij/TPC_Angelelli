@@ -43,7 +43,7 @@ namespace Negocio
             return tags;
         }
 
-            public async Task<Tag> GetObject(string id)
+        public async Task<Tag> GetObject(string id)
             {
                 Tag tag = new Tag();
                 var tagsAux = await Db.Client()

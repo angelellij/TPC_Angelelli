@@ -9,6 +9,8 @@ namespace Negocio
     class FireUrl
     {
         public string Root {get;set;}
+        public string Espacios { get; } = "espacios";
+        public string Usuarios { get; } = "usuarios";
         public FireUrl(string Root) => this.Root = Root;
         public string GetRootUrlFromKey(string Key)
         {
@@ -53,6 +55,10 @@ namespace Negocio
             List<string> Keys;
             Keys = GetUrlList(Url);
             return Keys[Keys.Count() - 1];    
+        }
+        public string GetFirstKeyFromUrl(string Url)
+        {
+            return GetUrlList(Url)[0];
         }
         public string GetFireKeyUrl(string Url)
         {

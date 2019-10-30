@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Dominio;
 using Negocio;
@@ -12,32 +13,34 @@ namespace WebAPI.Controllers
     public class UsuariosController : ApiController
     {
         // GET: api/Usuarios
-        public IEnumerable<string> Get()
+        public async Task<List<Usuario>> Get()
         {
-           return new string[] { "value1", "value2" };
+           return await new UsuarioNegocio().GetAll();
         }
 
         // GET: api/Usuarios/5
-        public string Get(int id)
+        public async Task<Usuario> Get(string id)
         {
-            return "value";
+            return await new UsuarioNegocio().GetObject(id);
         }
 
         // POST: api/Usuarios
-        public async void Post([FromBody]Usuario usuario)
+        public async Task Post([FromBody]Usuario usuario)
         {
             await new UsuarioNegocio().Create(usuario); 
 
         }
 
         // PUT: api/Usuarios/5
-        public void Put(int id, [FromBody]string value)
+        public async Task Put(string id, [FromBody]Usuario value)
         {
+            await new UsuarioNegocio().Update(id,value);
         }
 
         // DELETE: api/Usuarios/5
-        public void Delete(int id)
+        public async Task Delete(string id)
         {
+            await new UsuarioNegocio().Delete(id);
         }
     }
 }
