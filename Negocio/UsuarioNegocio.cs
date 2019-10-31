@@ -78,7 +78,7 @@ namespace Negocio
             string key = await FirebaseNewUser(usuario);
             if (key != null)
             {
-                await Db.Update(usuario, Url.GetRootUrlFromKey(key));
+                await Db.Update(usuario, Url.AddKey(Url.Root,key));
                 int i = 0;
                 if (usuario.ListadoEspacios != null)
                 {
@@ -86,10 +86,11 @@ namespace Negocio
                     {
                         await Db.Update(
                             usuario.ReturnSmallUsuario(),
-                            Url.AddKeyToUrl("Espacios",
-                                Url.AddKeyToUrl(usuario.ListadoEspacios[i].GetUrlEspacio(),
-                                    Url.AddKeyToUrl(Url.GetRootUrlFromKey(usuario.ListadoEspacios[i].Id),
-                                        key))));
+                            Url.AddKey("Espacios",
+                                Url.AddKey(usuario.ListadoEspacios[i].GetUrlEspacio(),
+                                    Url.AddKey(Url.Root,
+                                        Url.AddKey(usuario.ListadoEspacios[i].Id,
+                                        key)))));
                         i++;
                     }
                 }
@@ -99,12 +100,12 @@ namespace Negocio
         public async Task Update(string id, Usuario usuario)
         {
             usuario.Id = null;
-            await Db.Update(usuario, Url.GetRootUrlFromKey(id));
+            await Db.Update(usuario, Url.AddKey(Url.Root,id));
         }
 
         public async Task Delete(string id)
         {
-            await Db.Delete(Url.GetRootUrlFromKey(id));
+            await Db.Delete(Url.AddKey(Url.Root,id));
         }
 
     }

@@ -30,7 +30,7 @@ namespace Negocio
                                    .OnceAsync<Espacio>();
                     foreach (var espaciox in espaciosx)
                     {
-                        urlEspacios.Add(Url.AddKeyToUrl(urlEspacios[0], espaciox.Key));
+                        urlEspacios.Add(Url.AddKey(urlEspacios[0], espaciox.Key));
                         espacios.Add(new Espacio(espaciox));
                     }
                 }
@@ -44,7 +44,7 @@ namespace Negocio
         public async Task<Espacio> GetObject(string UrlEspacios)
         {
             var espaciosx = await Db.Client()
-              .Child(Url.GetRootUrlFromKey(Url.GetUrlWithoutLastKey(UrlEspacios)))
+              .Child(Url.AddKey(Url.Root,Url.GetUrlWithoutLastKey(UrlEspacios)))
               .OrderByKey()
               .EqualTo(Url.GetLastKeyFromUrl(UrlEspacios))
               .OnceAsync<Espacio>();
@@ -66,7 +66,7 @@ namespace Negocio
             else
             {
                 espacio.UrlEspacio = Url.GetFireKeyUrl(espacio.UrlEspacio);
-                await Db.Create(espacio, Url.GetRootUrlFromKey(espacio.GetUrlEspacio()));
+                await Db.Create(espacio, Url.AddKey(Url.Root,espacio.GetUrlEspacio()));
             }
             
         }
@@ -74,12 +74,12 @@ namespace Negocio
         public async Task Update(string url, Espacio espacio)
         {
             espacio.Id = null;
-            await Db.Update(espacio, Url.GetRootUrlFromKey(url));
+            await Db.Update(espacio, Url.AddKey(Url.Root,url));
         }
 
         public async Task Delete(string url)
         {
-            await Db.Delete(Url.GetRootUrlFromKey(url));
+            await Db.Delete(Url.AddKey(Url.Root,url));
         }
 
     }

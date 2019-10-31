@@ -11,12 +11,12 @@ namespace Negocio
 {
     public class PostNegocio
     {
-        FireUrl Url = new FireUrl("posts");
-        Db Db = new Db();
+        FireUrl Url { get; } = new FireUrl("posts");
+        Db Db { get; } = new Db();
         public async Task<List<Post>> GetAllFromEspacio(Espacio Espacio)
         {
             var data = await Db.Client()
-                .Child(Url.RootInOneEspacio(Espacio.UrlEspacio ,Espacio.Id))
+                .Child(Url.RootInOneEspacio(Espacio))
                 .OnceAsync<Post>();
             List<Post> posts = new List<Post>();
             foreach (FirebaseObject<Post> aux in data)
@@ -28,7 +28,7 @@ namespace Negocio
         public async Task<List<Post>> GetAllFromUsuario(Usuario usuario)
         {
             var data = await Db.Client()
-                .Child(Url.RootInOneUsuario(usuario.Id))
+                .Child(Url.AddKey(Url.Usuarios,usuario.Id))
                 .OnceAsync<Post>();
             List<Post> posts = new List<Post>();
             foreach (FirebaseObject<Post> aux in data)
@@ -40,7 +40,7 @@ namespace Negocio
         public async Task<Post> GetObjectFromEspacio(Espacio espacio, string key)
         {
             var x = await Db.Client()
-                .Child(Url.RootInOneEspacio(espacio.UrlEspacio,espacio.Id))
+                .Child(Url.RootInOneEspacio(espacio))
                 .OrderByKey()
                 .EqualTo(key)
                 .OnceSingleAsync<Post>();
@@ -52,41 +52,46 @@ namespace Negocio
             return x;
         }
         public async Task<Post> GetObjectFromUsuario(Usuario usuario, string key){
-            var x = await Db.Client()
-                .Child(Url.RootInOneUsuario(usuario.Id))
+            var data = await Db.Client()
+                .Child(Url.AddKey(Url.Usuarios,usuario.Id))
                 .OrderByKey()
                 .EqualTo(key)
-                .OnceSingleAsync<Post>();
-           
-            if (x != null)
+                .OnceAsync<Post>();
+            Post post = new Post();
+            if (data != null)
             {
-                x.Id = key;    
+                foreach (var aux in data)
+                post = new Post(aux);
             }
-            return x;
+            return post;
         }
         public async Task Create(Post post)
         {
             post.Id = null;
             var x = await Db.Create(post.ReturnSmallPost(), 
-                Url.RootInOneEspacio(post.Espacio.UrlEspacio,post.Espacio.Id));
+                Url.RootInOneEspacio(post.Espacio));
             if (x.Key != null)
             { 
                 await Db.Update(post.ReturnSmallPost(),
-                    Url.AddKeyToUrl(Url.RootInOneUsuario(post.Usuario.Id), x.Key));
+                    Url.AddKey(Url.AddKey(Url.Usuarios, post.Usuario.Id), x.Key));
             }    
         }
-        public async Task Update(Post post, string Key)
+        public async Task Update(Post post)
         {
+            string Key = post.Id;
             post.Id = null;
             await Db.Update(post.ReturnSmallPost(), 
-                Url.AddKeyToUrl(Url.RootInOneEspacio(post.Espacio.UrlEspacio, post.Espacio.Id),Key));
+                Url.AddKey(Url.RootInOneEspacio(post.Espacio),Key));
             await Db.Update(post.ReturnSmallPost(),
-                Url.AddKeyToUrl(Url.RootInOneUsuario(post.Usuario.Id), Key));
+                Url.AddKey(Url.AddKey(Url.Usuarios, post.Usuario.Id), Key));
         }
-        public async Task Delete(Post post, string Key)
+        public async Task Delete(Post post)
         {
-            await Db.Delete(Url.AddKeyToUrl(Url.RootInOneEspacio(post.Espacio.UrlEspacio, post.Espacio.Id), Key));
-            await Db.Delete(Url.AddKeyToUrl(Url.RootInOneUsuario(post.Usuario.Id), Key));
+            await Db.Delete(
+                Url.AddKey(
+                    Url.RootInOneEspacio(
+                        post.Espacio), post.Id));
+            await Db.Delete(Url.AddKey(Url.AddKey(Url.Usuarios, post.Usuario.Id), post.Id));
         }
     }
 }

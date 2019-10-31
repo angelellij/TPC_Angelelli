@@ -23,8 +23,8 @@ namespace Negocio
             foreach (var espaciox in espaciosAux)
             {
                 var noticiasAux = await Db.Client()
-              .Child(Url.AddKeyToUrl(Url.Espacios,
-                    Url.AddKeyToUrl(espaciox.Key,Url.Root)
+              .Child(Url.AddKey(Url.Espacios,
+                    Url.AddKey(espaciox.Key,Url.Root)
                     ))
               .OnceAsync<Noticia>();
 
@@ -39,8 +39,8 @@ namespace Negocio
         public async Task Create(Noticia noticia)
         {
             await Db.Create(noticia.ReturnNoticiaFire(),
-                Url.AddKeyToUrl(Url.Espacios,
-                    Url.AddKeyToUrl(noticia.Espacio.Id,
+                Url.AddKey(Url.Espacios,
+                    Url.AddKey(noticia.Espacio.Id,
                         Url.Root)
                     ));
         }
@@ -48,8 +48,8 @@ namespace Negocio
         public async Task Update(Noticia Noticia, string url)
         {
             await Db.Update(Noticia, 
-                Url.AddKeyToUrl(Url.Espacios,
-                    Url.AddKeyToUrl(url,Url.Root)
+                Url.AddKey(Url.Espacios,
+                    Url.AddKey(url,Url.Root)
                     ));
         }
 

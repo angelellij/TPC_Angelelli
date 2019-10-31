@@ -62,18 +62,18 @@ namespace Negocio
         public async Task Create(Tag tag)
         {
            await Db.Create(tag.ReturnSmallTag(), Url.Root);
-           await Db.Create(tag, Url.GetRootUrlFromKey(tag.Espacio.GetUrlEspacio()));
+           await Db.Create(tag, Url.AddKey(Url.Root,tag.Espacio.GetUrlEspacio()));
         }
       
         public async Task Update (string id, Tag tag)
         {
             tag.Id = null;
-            await Db.Update(tag, Url.GetRootUrlFromKey(id));
+            await Db.Update(tag, Url.AddKey(Url.Root,id));
         }
 
         public async Task Delete (string id)
         {
-            await Db.Delete(Url.GetRootUrlFromKey(id));
+            await Db.Delete(Url.AddKey(Url.Root,id));
         }
 
     }

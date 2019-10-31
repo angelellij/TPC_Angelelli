@@ -23,13 +23,13 @@ namespace Dominio
         public Post(FirebaseObject<Post> Post)
         {
             Id = Post.Key;
-            Espacio Espacio = new Espacio();
+            Espacio = new Espacio();
             Espacio = Post.Object.Espacio;
-            Usuario Usuario = new Usuario();
+            Usuario = new Usuario();
             Usuario = Post.Object.Usuario;
             Titulo = Post.Object.Titulo;
             Descripcion = Post.Object.Descripcion;
-            Tag Tag = new Tag();
+            Tag = new Tag();
             Tag = Post.Object.Tag;
             Date = Post.Object.Date;
             Deleted = Post.Object.Deleted;

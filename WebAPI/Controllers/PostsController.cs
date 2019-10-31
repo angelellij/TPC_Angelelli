@@ -12,13 +12,23 @@ namespace WebAPI.Controllers
 {
     public class PostsController : ApiController
     {
-        // GET: api/Post
-        public IEnumerable<string> Get()
+        [Route("~/api/posts/espacios/")]
+        public async Task<List<Post>> Get([FromBody]Espacio espacio)
         {
-            return new string[] { "value1", "value2" };
+            return await new PostNegocio().GetAllFromEspacio(espacio);
+        }
+        [Route("~/api/posts/usuarios/")]
+        public async Task<List<Post>> Get([FromBody]Usuario usuario)
+        {
+            return await new PostNegocio().GetAllFromUsuario(usuario);
+        }
+        [Route("~/api/posts/espacios/{id}")]
+        public async Task<Post> Get(string id, [FromBody]Espacio espacio)
+        {
+            return await new PostNegocio().GetObjectFromEspacio(espacio, id);
         }
 
-        // GET: api/Post/5
+        [Route("~/api/posts/usuarios/{id}")]
         public async Task<Post> Get(string id,[FromBody]Usuario usuario)
         {
             return await new PostNegocio().GetObjectFromUsuario(usuario,id);
@@ -31,15 +41,15 @@ namespace WebAPI.Controllers
         }
 
         // PUT: api/Post/5
-        public async Task Put(string id, [FromBody]Post post)
+        public async Task Put([FromBody]Post post)
         {
-            await new PostNegocio().Update(post,id);
+            await new PostNegocio().Update(post);
         }
 
         // DELETE: api/Post/5
-        public async Task Delete(string id, [FromBody]Post post)
+        public async Task Delete([FromBody]Post post)
         {
-            await new PostNegocio().Delete(post, id);
+            await new PostNegocio().Delete(post);
         }
     }
 }

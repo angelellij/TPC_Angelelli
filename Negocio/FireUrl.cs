@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dominio;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,14 +13,12 @@ namespace Negocio
         public string Espacios { get; } = "espacios";
         public string Usuarios { get; } = "usuarios";
         public FireUrl(string Root) => this.Root = Root;
-        public string GetRootUrlFromKey(string Key)
+
+        public string AddKey(string Url, string Key)
         {
-            if (Key.StartsWith("/"))
-            {
-                return Root + Key;
-            }
-            return Root + "/" + Key;
+            return Url + "/" + Key;
         }
+
         public string GetUrlFromList(List<string> Keys)
         {
             string url = Keys[0];
@@ -27,10 +26,11 @@ namespace Negocio
             {
                 url = url + "/" + Keys[i];
             }
-            url = url.Replace("-","");
+//            url = url.Replace("-","");
             return url;
         }
-        public List<string> GetUrlList(string Url)
+
+        public List<string> GetKeyList(string Url)
         {
             string[] UrlListAux = (string[])Url.Split('-');
             List<string> UrlList = new List<string>();
@@ -44,50 +44,44 @@ namespace Negocio
             }
             return UrlList;
         }
-        public string GetUrlWithoutLastKey(string Url)
+
+        public string ConvertSavedUrlToFireUrl(string SavedUrl)
         {
-            List<string> Keys;
-            Keys = GetUrlList(Url);
-            Keys.Remove(Keys[Keys.Count()-1]);
-            return GetUrlFromList(Keys);
+            return GetUrlFromList(GetKeyList(SavedUrl));
         }
+
         public string GetLastKeyFromUrl(string Url)
         {
             List<string> Keys;
-            Keys = GetUrlList(Url);
+            Keys = GetKeyList(Url);
             return Keys[Keys.Count() - 1];    
         }
         public string GetFirstKeyFromUrl(string Url)
         {
-            return GetUrlList(Url)[0];
+            return GetKeyList(Url)[0];
         }
+       
+        // H
         public string GetFireKeyUrl(string Url)
         {
             Url.Replace("/", "");
             return Url;
         }
-
-        public string AddKeyToUrl(string Url, string Key)
+    
+        public string RootInOneEspacio(Espacio Espacio)
         {
-            return Url + "/" + Key;
+            return AddKey(Espacios,
+                       AddKey(ConvertSavedUrlToFireUrl(Espacio.UrlEspacio),
+                            Espacio.Id));
         }
 
-        public string RootInOneEspacio(string UrlEspacio, string EspacioKey)
+        public string GetUrlWithoutLastKey(string Url)
         {
-            return AddKeyToUrl(Espacios,
-                       AddKeyToUrl(GetUrlFromList(GetUrlList(UrlEspacio)),
-                            AddKeyToUrl(EspacioKey, 
-                                Root)));
+            List<string> Keys;
+            Keys = GetKeyList(Url);
+            Keys.Remove(Keys[Keys.Count() - 1]);
+            return GetUrlFromList(Keys);
         }
-        public string RootInOneUsuario(string KeyUsuario)
-        {
-            return AddKeyToUrl(Usuarios,
-                       AddKeyToUrl(ConvertSavedUrlToFireUrl(KeyUsuario),
-                                Root));
-        }
-        public string ConvertSavedUrlToFireUrl(string SavedUrl)
-        {
-            return GetUrlFromList(GetUrlList(SavedUrl));
-        }
+
     }
 }
