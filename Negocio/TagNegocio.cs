@@ -12,68 +12,61 @@ namespace Negocio
     {
         private FireUrl Url { get; set; } = new FireUrl("Tags");
         private Db Db { get; } = new Db();
-       
-        public async Task<List<Tag>> GetAll()
+
+        private Go<Tag> Tag { get; }
+
+        private string UrlEspacios { get; } = "";
+        public TagNegocio(Go<Tag> tag)
         {
-            List<Tag> tags = new List<Tag>();
-               var tagsAux = await Db.Client()
-              .Child(Url.Root)
+            Tag = new Go<Tag>(tag);
+            UrlEspacios = Url.AddKey(Url.Espacios,
+                    Url.AddKey(Url.ConvertSavedUrlToFireUrl(Tag.Object.Espacio.Object.UrlEspacio),
+                        Url.AddKey(Tag.Object.Espacio.Key, 
+                            Url.Root)));
+        }
+
+        public async Task<IDictionary<string, Tag>> GetAllFromEspacios()
+        {
+            IDictionary<string, Tag> tags = new Dictionary<string, Tag>();
+               var data = await Db.Client()
+              .Child(UrlEspacios)
               .OnceAsync<Tag>();
 
-            foreach (var tagAux in tagsAux)
+            foreach (var aux in data)
             {
-                tags.Add(new Tag(tagAux)); 
+                tags.Add(aux.Key,aux.Object); 
             }
 
             return tags;
         }
 
-        public async Task<List<Tag>> GetAllFromEspacio(string urlEspacio)
-        {
-            List<Tag> tags = new List<Tag>();
-            var tagsAux = await Db.Client()
-           .Child(urlEspacio + "/" + Url.Root)
-           .OnceAsync<Tag>();
-
-            foreach (var tagAux in tagsAux)
+        public async Task<Go<Tag>> GetObject()
             {
-                tags.Add(new Tag(tagAux));
-            }
-
-            return tags;
-        }
-
-        public async Task<Tag> GetObject(string id)
-            {
-                Tag tag = new Tag();
-                var tagsAux = await Db.Client()
-               .Child(Url.Root)
+                var data = await Db.Client()
+               .Child(UrlEspacios)
                .OrderByKey()
-               .EqualTo(id)
-               .OnceAsync<Tag>();
+               .EqualTo(Tag.Key)
+               .OnceSingleAsync<Tag>();
 
-                foreach (var tagAux in tagsAux)
-                {
-                    tag = new Tag(tagAux);
-                }
-                return tag;
+                if (data == null) { Tag.Key = null; }
+                else { Tag.Object = data;  }
+                
+                return Tag;
             }
 
-        public async Task Create(Tag tag)
+        public async Task Create()
         {
-           await Db.Create(tag.ReturnSmallTag(), Url.Root);
-           await Db.Create(tag, Url.AddKey(Url.Root,tag.Espacio.GetUrlEspacio()));
+           await Db.Create(Tag, UrlEspacios);
         }
       
-        public async Task Update (string id, Tag tag)
+        public async Task Update ()
         {
-            tag.Id = null;
-            await Db.Update(tag, Url.AddKey(Url.Root,id));
+            await Db.Update(Tag, Url.AddKey(UrlEspacios,Tag.Key));
         }
 
-        public async Task Delete (string id)
+        public async Task Delete ()
         {
-            await Db.Delete(Url.AddKey(Url.Root,id));
+            await Db.Delete(Url.AddKey(UrlEspacios,Tag.Key));
         }
 
     }

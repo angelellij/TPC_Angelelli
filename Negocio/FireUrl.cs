@@ -10,8 +10,11 @@ namespace Negocio
     class FireUrl
     {
         public string Root {get;set;}
-        public string Espacios { get; } = "espacios";
-        public string Usuarios { get; } = "usuarios";
+        public string Espacios { get; } = "Espacios";
+        public string Usuarios { get; } = "Usuarios";
+        public string Administradores { get; } = "Administradores";
+        public string Miembros { get; } = "Miembros";
+
         public FireUrl(string Root) => this.Root = Root;
 
         public string AddKey(string Url, string Key)
@@ -56,6 +59,7 @@ namespace Negocio
             Keys = GetKeyList(Url);
             return Keys[Keys.Count() - 1];    
         }
+
         public string GetFirstKeyFromUrl(string Url)
         {
             return GetKeyList(Url)[0];
@@ -68,11 +72,11 @@ namespace Negocio
             return Url;
         }
     
-        public string RootInOneEspacio(Espacio Espacio)
+        public string RootInOneEspacio(Go<Espacio> Espacio)
         {
             return AddKey(Espacios,
-                       AddKey(ConvertSavedUrlToFireUrl(Espacio.UrlEspacio),
-                            Espacio.Id));
+                       AddKey(ConvertSavedUrlToFireUrl(Espacio.Object.UrlEspacio),
+                            Espacio.Key));
         }
 
         public string GetUrlWithoutLastKey(string Url)

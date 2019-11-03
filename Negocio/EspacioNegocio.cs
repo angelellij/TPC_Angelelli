@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,11 +12,40 @@ namespace Negocio
 {
     public class EspacioNegocio
     {
-        private FireUrl Url { get; } = new FireUrl("espacios");
+        private FireUrl Url { get; } = new FireUrl("Espacios");
         private Db Db { get; } = new Db();
-        public async Task<List<Espacio>> GetAll()
+        private Go<Espacio> Espacio;
+        private string urlEspacios { get; } = "";
+        private List<string> urlUsuarios { get; } = new List <string>();
+        public EspacioNegocio() { }
+        public EspacioNegocio(Go<Espacio> espacio)
         {
-            List<Espacio> espacios = new List<Espacio>();
+            this.Espacio = new Go<Espacio>(espacio);
+
+            if (Espacio.Object.UrlEspacio != null & Espacio.Object.UrlEspacio != ""){
+                urlEspacios = Url.AddKey(Url.Root,
+                                Url.ConvertSavedUrlToFireUrl(Espacio.Object.UrlEspacio));
+            }
+            else { urlEspacios = Url.Root; }
+            if(Espacio.Object.Administradores != null)
+            {
+                foreach (var x in Espacio.Object.Administradores)
+                {
+                    urlUsuarios.Add(Url.AddKey(Url.Usuarios,
+                                        Url.AddKey((string)x.Key, Url.Administradores)));
+                }
+            }
+            if (Espacio.Object.Miembros != null)
+            {
+                foreach (var x in espacio.Object.Miembros)
+                    urlUsuarios.Add(Url.AddKey(Url.Usuarios,
+                                        Url.AddKey(x.Key, Url.Miembros)));
+            }
+        }  
+
+        public async Task<IDictionary<string, Espacio>> GetAll()
+        {
+            IDictionary<string, Espacio> espacios = new Dictionary<string, Espacio>();
             List<string> urlEspacios = new List<string>
             {
                 Url.Root
@@ -23,63 +53,67 @@ namespace Negocio
 
             while (urlEspacios.Count > 0)
             {
-                try
+                var espaciosx = await Db.Client()
+                .Child(urlEspacios[0])
+                .OnceAsync<Espacio>();
+
+                if (espaciosx != null)
                 {
-                    var espaciosx = await Db.Client()
-                                   .Child(urlEspacios[0])
-                                   .OnceAsync<Espacio>();
                     foreach (var espaciox in espaciosx)
                     {
                         urlEspacios.Add(Url.AddKey(urlEspacios[0], espaciox.Key));
-                        espacios.Add(new Espacio(espaciox));
+                        espacios.Add(espaciox.Key, espaciox.Object);
                     }
                 }
-                finally { }
-                
                 urlEspacios.Remove(urlEspacios[0]);
             }
             return espacios;
         }
 
-        public async Task<Espacio> GetObject(string UrlEspacios)
+        public async Task<Go<Espacio>> GetObject()
         {
             var espaciosx = await Db.Client()
-              .Child(Url.AddKey(Url.Root,Url.GetUrlWithoutLastKey(UrlEspacios)))
+              .Child(urlEspacios)
               .OrderByKey()
-              .EqualTo(Url.GetLastKeyFromUrl(UrlEspacios))
+              .EqualTo(Espacio.Key)
               .OnceAsync<Espacio>();
 
-            Espacio espacio = new Espacio();
+            Espacio.Key = null;
             foreach (var espaciox in espaciosx)
             {
-                espacio = new Espacio(espaciox);
+                Espacio = new Go<Espacio>(espaciox);
             }
-            return espacio;
+            return Espacio;
         }
 
-        public async Task Create(Espacio espacio)
+        public async Task Create()
         {
-            espacio.Id = null;
-            if (espacio.UrlEspacio == null || espacio.UrlEspacio == ""){
-                await Db.Create(espacio, Url.Root);
-            }
-            else
+            var x = await Db.Create(Espacio, urlEspacios);
+            if (x != null)
             {
-                espacio.UrlEspacio = Url.GetFireKeyUrl(espacio.UrlEspacio);
-                await Db.Create(espacio, Url.AddKey(Url.Root,espacio.GetUrlEspacio()));
+                foreach (var urlaux in urlUsuarios)
+                {
+                    await Db.Update(Espacio.Object.ReturnSmallEspacio(), Url.AddKey(urlaux, Espacio.Key));
+                }  
             }
-            
         }
 
-        public async Task Update(string url, Espacio espacio)
+        public async Task Update()
         {
-            espacio.Id = null;
-            await Db.Update(espacio, Url.AddKey(Url.Root,url));
+            await Db.Update(Espacio, Url.AddKey(urlEspacios, Espacio.Key));
+            foreach (string urlaux in urlUsuarios)
+            {
+                await Db.Update(Espacio, Url.AddKey(urlaux,Espacio.Key));
+            }
         }
 
-        public async Task Delete(string url)
+        public async Task Delete()
         {
-            await Db.Delete(Url.AddKey(Url.Root,url));
+            await Db.Delete(Url.AddKey(urlEspacios, Espacio.Key));
+            foreach (string urlaux in urlUsuarios)
+            {
+                await Db.Delete(Url.AddKey(urlaux,Espacio.Key));
+            }
         }
 
     }

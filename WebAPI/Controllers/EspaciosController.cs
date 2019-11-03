@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Collections;
 using Dominio;
 using Negocio;
 
@@ -13,33 +14,33 @@ namespace WebAPI.Controllers
     public class EspaciosController : ApiController
     {
         // GET: api/Tags
-        public async Task<List<Espacio>> GetAll()
+        public async Task<IDictionary<string, Espacio>> GetAll()
         {
             return await new EspacioNegocio().GetAll();
         }
 
         // GET: api/Tags/stringId
-        public Task<Espacio> Get(string id)
+        public async Task<Go<Espacio>> Get(string id)
         {
-            return new EspacioNegocio().GetObject(id);
+            return await new EspacioNegocio(new Go<Espacio>(id)).GetObject();
         }
 
         // POST: api/Tags
-        public async Task Post([FromBody]Espacio value)
+        public async Task Post([FromBody]Espacio Espacio)
         {
-            await new EspacioNegocio().Create(value);
+            await new EspacioNegocio(new Go<Espacio>(Espacio)).Create();
         }
 
         // PUT: api/Tags/stringId
-        public async void Put(string id, [FromBody]Espacio espacio)
+        public async void Put(string id, [FromBody]Espacio Espacio)
         {
-            await new EspacioNegocio().Update(id, espacio);
+            await new EspacioNegocio(new Go<Espacio>(id,Espacio)).Update();
         }
 
         // DELETE: api/Tags/stringId
-        public async void Delete(string value)
+        public async void Delete(string id)
         {
-            await new EspacioNegocio().Delete(value);
+            await new EspacioNegocio(new Go<Espacio>(id)).Delete();
         }
     }
 }

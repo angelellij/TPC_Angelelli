@@ -13,43 +13,51 @@ namespace WebAPI.Controllers
     public class PostsController : ApiController
     {
         [Route("~/api/posts/espacios/")]
-        public async Task<List<Post>> Get([FromBody]Espacio espacio)
+        public async Task<IDictionary<string, Post>> Get([FromBody]Go<Espacio> espacio)
         {
-            return await new PostNegocio().GetAllFromEspacio(espacio);
+            Go<Post> Post = new Go<Post>();
+            Post.Object.Espacio = new Go<Espacio>(espacio);
+            return await new PostNegocio(Post).GetAllFromEspacio();
         }
         [Route("~/api/posts/usuarios/")]
-        public async Task<List<Post>> Get([FromBody]Usuario usuario)
+        public async Task<List<Post>> Get([FromBody]Go<Usuario> usuario)
         {
-            return await new PostNegocio().GetAllFromUsuario(usuario);
+            Go<Post> Post = new Go<Post>();
+            Post.Object.Usuario = new Go<Usuario>(usuario);
+            return await new PostNegocio(Post).GetAllFromUsuario();
         }
         [Route("~/api/posts/espacios/{id}")]
-        public async Task<Post> Get(string id, [FromBody]Espacio espacio)
+        public async Task<Go<Post>> Get(string id, [FromBody]Espacio espacio)
         {
-            return await new PostNegocio().GetObjectFromEspacio(espacio, id);
+            Go<Post> Post = new Go<Post>(id);
+            Post.Object.Espacio = new Go<Espacio>(espacio);
+            return await new PostNegocio(Post).GetObjectFromEspacio();
         }
 
         [Route("~/api/posts/usuarios/{id}")]
-        public async Task<Post> Get(string id,[FromBody]Usuario usuario)
+        public async Task<Go<Post>> Get(string id,[FromBody]Usuario usuario)
         {
-            return await new PostNegocio().GetObjectFromUsuario(usuario,id);
+            Go<Post> Post = new Go<Post>();
+            Post.Object.Usuario = new Go<Usuario>(usuario);
+            return await new PostNegocio(Post).GetObjectFromUsuario();
         }
 
         // POST: api/Post
-        public async Task Post([FromBody]Post value)
+        public async Task Post([FromBody]Post post)
         {
-            await new PostNegocio().Create(value);
+            await new PostNegocio(new Go<Post>(post)).Create();
         }
 
         // PUT: api/Post/5
-        public async Task Put([FromBody]Post post)
+        public async Task Put([FromBody]Post post, string id)
         {
-            await new PostNegocio().Update(post);
+            await new PostNegocio(new Go<Post>(id, post)).Update();
         }
 
         // DELETE: api/Post/5
-        public async Task Delete([FromBody]Post post)
+        public async Task Delete([FromBody]string id)
         {
-            await new PostNegocio().Delete(post);
+            await new PostNegocio(new Go<Post>(id)).Delete();
         }
     }
 }

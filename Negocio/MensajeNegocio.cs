@@ -11,91 +11,81 @@ namespace Negocio
 {
     public class MensajeNegocio
     {
-        private FireUrl Url { get; } = new FireUrl("mensajes");
+        private FireUrl Url { get; } = new FireUrl("Mensajes");
         private Db Db { get; } = new Db();
+        private Go<Mensaje> Mensaje { get; } = new Go<Mensaje>();
+        private string UrlEmisor { get; } = "";
+        private string UrlReceptor { get; } = "";
 
-        private string urlEmisor;
-        private string urlReceptor;
-
-        public MensajeNegocio(Mensaje Mensaje)
+        public MensajeNegocio() { }
+        public MensajeNegocio(Go<Mensaje> mensaje)
         {
-            urlEmisor = Url.AddKey(Url.Usuarios,
-                            Url.AddKey(Mensaje.Emisor.Id,
+            Mensaje = new Go<Mensaje>(mensaje);
+            UrlEmisor = Url.AddKey(Url.Usuarios,
+                            Url.AddKey(Mensaje.Object.Emisor.Key,
                                 Url.AddKey(Url.Root,
-                                    Mensaje.Receptor.Id)));
-            urlReceptor = Url.AddKey(Url.Usuarios,
-                            Url.AddKey(Mensaje.Receptor.Id,
+                                    Mensaje.Object.Receptor.Key)));
+            UrlReceptor = Url.AddKey(Url.Usuarios,
+                            Url.AddKey(Mensaje.Object.Receptor.Key,
                                 Url.AddKey(Url.Root,
-                                    Mensaje.Emisor.Id)));
+                                    Mensaje.Object.Emisor.Key)));
         }
 
-        public async Task<List<Mensaje>> GetAllFrom(Mensaje Mensaje, int opcion)
+        public async Task<IDictionary<string, Mensaje>> GetAllFrom(int opcion)
         {
             string url = "";
-            if (opcion == 1) { url = urlEmisor; }
-            if (opcion == 2) { url = urlReceptor; }
+            if (opcion == 1) { url = UrlEmisor; }
+            if (opcion == 2) { url = UrlReceptor; }
             var data = await Db.Client()
                 .Child(url)
                 .OnceAsync<Mensaje>();
-            List<Mensaje> Mensajes = new List<Mensaje>();
-            foreach (FirebaseObject<Mensaje> aux in data)
+
+            IDictionary<string, Mensaje> Mensajes = new Dictionary<string, Mensaje>();
+
+            foreach (var aux in data)
             {
-                Mensaje MensajeAux = new Mensaje(aux);
-                MensajeAux.Emisor = new Usuario();
-                MensajeAux.Emisor = Mensaje.Emisor;
-                MensajeAux.Receptor = new Usuario();
-                MensajeAux.Receptor = Mensaje.Receptor;
-                Mensajes.Add(MensajeAux);
+                Mensajes.Add(aux.Key, aux.Object);
             }
             return Mensajes;
         }
 
-        public async Task<Mensaje> GetObjectFrom(Mensaje Mensaje, int opcion)
+        public async Task<Go<Mensaje>> GetObjectFrom(int opcion)
         {
             string url = "";
-            if (opcion == 1) { url = urlEmisor; }
-            if (opcion == 2) { url = urlReceptor; }
+            if (opcion == 1) { url = UrlEmisor; }
+            if (opcion == 2) { url = UrlReceptor; }
             var x = await Db.Client()
                 .Child(url)
                 .OrderByKey()
-                .EqualTo(Mensaje.Id)
+                .EqualTo(Mensaje.Key)
                 .OnceSingleAsync<Mensaje>();
 
-            if (x != null)
-            {
-                x.Id = Mensaje.Id;
-                x.Emisor = new Usuario();
-                x.Emisor = Mensaje.Emisor;
-                x.Receptor = new Usuario();
-                x.Receptor = Mensaje.Receptor;
-            }
-            return x;
+            if (x == null) { Mensaje.Key = null; }
+            else { Mensaje.Object = x; }
+            return Mensaje;
         }
 
-        public async Task Create(Mensaje Mensaje)
+        public async Task Create()
         {
-            Mensaje.Id = null;
-            var x = await Db.Create(Mensaje.ReturnSmallMensaje(), urlReceptor); ;
+            var x = await Db.Create(Mensaje.Object.ReturnSmallMensaje(), UrlReceptor); ;
             if (x.Key != null)
             {
-                await Db.Update(Mensaje.ReturnSmallMensaje(), Url.AddKey(urlEmisor, x.Key));
+                await Db.Update(Mensaje.Object.ReturnSmallMensaje(), Url.AddKey(UrlEmisor, x.Key));
             }
         }
 
-        public async Task Update(Mensaje Mensaje)
+        public async Task Update()
         {
-            string Key = Mensaje.Id;
-            Mensaje.Id = null;
-            await Db.Update(Mensaje.ReturnSmallMensaje(),
-                Url.AddKey(urlEmisor, Key));
-            await Db.Update(Mensaje.ReturnSmallMensaje(),
-                Url.AddKey(urlReceptor, Key));
+            await Db.Update(Mensaje.Object.ReturnSmallMensaje(),
+                Url.AddKey(UrlEmisor, Mensaje.Key));
+            await Db.Update(Mensaje.Object.ReturnSmallMensaje(),
+                Url.AddKey(UrlReceptor, Mensaje.Key));
         }
 
-        public async Task Delete(Mensaje Mensaje)
+        public async Task Delete()
         {
-            await Db.Delete(Url.AddKey(urlEmisor, Mensaje.Id));
-            await Db.Delete(Url.AddKey(urlReceptor, Mensaje.Id));
+            await Db.Delete(Url.AddKey(UrlEmisor, Mensaje.Key));
+            await Db.Delete(Url.AddKey(UrlReceptor, Mensaje.Key));
         }
     }
 }

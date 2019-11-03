@@ -9,19 +9,30 @@ namespace Dominio
 {
     public class Usuario
     {
-        public string Id { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get; set; }
         public string Email{ get; set; }
         public string Contrasena { get; set; }
         public string FNacimiento { get; set; }
         public string UrlFoto { get; set; }
-        public List<Espacio> ListadoEspacios { get; set; }
+        public IDictionary<string, Espacio> EspaciosAdministrador { get; set; } = new Dictionary<string, Espacio>();
+        public IDictionary<string, Espacio> EspaciosMiembro { get; set; } = new Dictionary<string, Espacio>();
         public string TimestampUtc { get; set; }
         public Usuario() { }
+        public Usuario(Usuario usuario)
+        {
+            Nombre = usuario.Nombre;
+            Apellido = usuario.Apellido;
+            Email = usuario.Email;
+            Contrasena = usuario.Contrasena;
+            UrlFoto = usuario.UrlFoto;
+            FNacimiento = usuario.FNacimiento;
+            TimestampUtc = usuario.TimestampUtc;
+            EspaciosAdministrador = usuario.EspaciosAdministrador;
+            EspaciosMiembro = usuario.EspaciosMiembro;
+        }
         public Usuario(FirebaseObject<Usuario> usuario)
         {
-            Id = usuario.Key;
             Nombre = usuario.Object.Nombre;
             Apellido = usuario.Object.Apellido;
             Email = usuario.Object.Email;
@@ -29,19 +40,18 @@ namespace Dominio
             UrlFoto = usuario.Object.UrlFoto;
             FNacimiento = usuario.Object.FNacimiento;
             TimestampUtc = usuario.Object.TimestampUtc;
-            ListadoEspacios = usuario.Object.ListadoEspacios;
+            EspaciosAdministrador = usuario.Object.EspaciosAdministrador;
+            EspaciosMiembro = usuario.Object.EspaciosMiembro;
         }
 
         public Usuario ReturnSmallUsuario()
         {
-            Usuario SmallUsuario = new Usuario
+           return new Usuario
             {
-                Id = Id,
                 Nombre = Nombre,
                 Apellido = Apellido,
                 UrlFoto = UrlFoto
             };
-            return SmallUsuario;
         }
         
 

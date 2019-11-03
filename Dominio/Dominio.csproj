@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="Comentario.cs" />
     <Compile Include="Espacio.cs" />
+    <Compile Include="Go.cs" />
     <Compile Include="Mensaje.cs" />
     <Compile Include="Noticia.cs" />
     <Compile Include="Post.cs" />

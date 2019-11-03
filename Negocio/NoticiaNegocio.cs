@@ -10,46 +10,69 @@ namespace Negocio
 {
     public class NoticiaNegocio
     {
-        private FireUrl Url { get; } = new FireUrl("noticias");
+        private FireUrl Url { get; } = new FireUrl("Noticias");
         private Db Db { get; } = new Db();
-        public async Task<List<Noticia>> GetAll()
-        {
-            List<Noticia> noticias = new List<Noticia>();
+        private string UrlEspacios { get; } = "";
+        private Go<Noticia> Noticia { get; set; }
 
-            var espaciosAux = await Db.Client()
+        public NoticiaNegocio() { }
+        public NoticiaNegocio(Go<Noticia> noticia)
+        {
+            Noticia = new Go<Noticia>(noticia);
+            UrlEspacios = Url.AddKey(Url.Espacios,
+                    Url.AddKey(Noticia.Object.Espacio.Key,
+                        Url.Root)
+                    );
+        }
+
+        public async Task<IDictionary<string, Noticia>> GetAll()
+        {
+            IDictionary<string, Noticia> noticias = new Dictionary<string, Noticia>();
+
+            var data = await Db.Client()
               .Child(Url.Espacios)
               .OnceAsync<Espacio>();
 
-            foreach (var espaciox in espaciosAux)
+            foreach (var aux in data)
             {
-                var noticiasAux = await Db.Client()
+                var datax = await Db.Client()
               .Child(Url.AddKey(Url.Espacios,
-                    Url.AddKey(espaciox.Key,Url.Root)
+                    Url.AddKey(aux.Key,Url.Root)
                     ))
               .OnceAsync<Noticia>();
 
-                foreach (var noticia in noticiasAux)
+                foreach (var auxx in datax)
                 {
-                    noticias.Add(new Noticia(noticia));
+                    noticias.Add(auxx.Key,auxx.Object);
                 }
             }
             return noticias;
         }
-       
-        public async Task Create(Noticia noticia)
+
+        public async Task<Go<Noticia>> GetObject()
         {
-            await Db.Create(noticia.ReturnNoticiaFire(),
-                Url.AddKey(Url.Espacios,
-                    Url.AddKey(noticia.Espacio.Id,
-                        Url.Root)
-                    ));
+            var x = await Db.Client()
+                .Child(UrlEspacios)
+                .OrderByKey()
+                .EqualTo(Noticia.Key)
+                .OnceSingleAsync<Noticia>();
+
+            if (x == null) { Noticia.Key = null; }
+            else { Noticia.Object = x; }
+            return Noticia;
         }
 
-        public async Task Update(Noticia Noticia, string url)
+
+        public async Task Create()
+        {
+            await Db.Create(Noticia.Object.ReturnNoticiaFire(), UrlEspacios);
+        }
+
+        public async Task Update()
         {
             await Db.Update(Noticia, 
                 Url.AddKey(Url.Espacios,
-                    Url.AddKey(url,Url.Root)
+                    Url.AddKey(UrlEspacios,Url.Root)
                     ));
         }
 

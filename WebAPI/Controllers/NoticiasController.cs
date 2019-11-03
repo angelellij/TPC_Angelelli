@@ -13,33 +13,33 @@ namespace WebAPI.Controllers
     public class NoticiasController : ApiController
     {
         // GET: api/Noticia
-        public async Task<List<Noticia>> Get()
+        public async Task<IDictionary<string,Noticia>> Get()
         {
             return await new NoticiaNegocio().GetAll();
         }
 
         // GET: api/Noticia/5
-        public string Get(string id)
+        public async Task<Go<Noticia>> Get(string id)
         {
-            return "value";
+            return await new NoticiaNegocio(new Go<Noticia>(id)).GetObject();
         }
 
         // POST: api/Noticia
         public async Task Post([FromBody]Noticia noticia)
         {
-            await new NoticiaNegocio().Create(noticia);
+            await new NoticiaNegocio(new Go<Noticia>(noticia)).Create();
         }
 
         // PUT: api/Noticia/5
         public async Task Put([FromBody]Noticia noticia, string id)
         {
-            await new NoticiaNegocio().Update(noticia, id);
+            await new NoticiaNegocio(new Go<Noticia>(id,noticia)).Update();
         }
 
         // DELETE: api/Noticia/5
         public async Task Delete(string id)
         {
-            await new NoticiaNegocio().Delete(id);
+            await new NoticiaNegocio(new Go<Noticia>(id)).Delete(id);
         }
     }
 }

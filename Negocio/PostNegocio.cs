@@ -11,12 +11,34 @@ namespace Negocio
 {
     public class PostNegocio
     {
-        FireUrl Url { get; } = new FireUrl("posts");
-        Db Db { get; } = new Db();
-        public async Task<List<Post>> GetAllFromEspacio(Espacio Espacio)
+        private FireUrl Url { get; } = new FireUrl("Posts");
+        private Db Db { get; } = new Db();
+        private string UrlEspacios { get; } = "";
+        private string UrlUsuarios { get; } = "";
+        private Go<Post> Post { get; }
+
+        public PostNegocio(Go<Post> post)
+        {
+            Post = new Go<Post>(post);
+            UrlEspacios = Url.RootInOneEspacio(Post.Object.Espacio);
+            UrlUsuarios = Url.AddKey(Url.Usuarios, Post.Object.Usuario.Key);
+        }
+        public async Task<IDictionary<string, Post>> GetAllFromEspacio()
         {
             var data = await Db.Client()
-                .Child(Url.RootInOneEspacio(Espacio))
+                .Child(UrlEspacios)
+                .OnceAsync<Post>();
+            IDictionary<string, Post> posts = new Dictionary<string, Post>();
+            foreach (FirebaseObject<Post> aux in data)
+            {
+                posts.Add(aux.Key, aux.Object);
+            }
+            return posts;
+        }
+        public async Task<List<Post>> GetAllFromUsuario()
+        {
+            var data = await Db.Client()
+                .Child(UrlUsuarios)
                 .OnceAsync<Post>();
             List<Post> posts = new List<Post>();
             foreach (FirebaseObject<Post> aux in data)
@@ -25,73 +47,51 @@ namespace Negocio
             }
             return posts;
         }
-        public async Task<List<Post>> GetAllFromUsuario(Usuario usuario)
-        {
-            var data = await Db.Client()
-                .Child(Url.AddKey(Url.Usuarios,usuario.Id))
-                .OnceAsync<Post>();
-            List<Post> posts = new List<Post>();
-            foreach (FirebaseObject<Post> aux in data)
-            {
-                posts.Add(new Post(aux));
-            }
-            return posts;
-        }
-        public async Task<Post> GetObjectFromEspacio(Espacio espacio, string key)
+        public async Task<Go<Post>> GetObjectFromEspacio()
         {
             var x = await Db.Client()
-                .Child(Url.RootInOneEspacio(espacio))
+                .Child(UrlEspacios)
                 .OrderByKey()
-                .EqualTo(key)
+                .EqualTo(Post.Key)
                 .OnceSingleAsync<Post>();
 
-            if (x != null)
-            {
-                x.Id = key;
-            }
-            return x;
+            if (x == null) { Post.Key = null; }
+            else { Post.Object = x; }
+            return Post;
         }
-        public async Task<Post> GetObjectFromUsuario(Usuario usuario, string key){
+        public async Task<Go<Post>> GetObjectFromUsuario(){
             var data = await Db.Client()
-                .Child(Url.AddKey(Url.Usuarios,usuario.Id))
+                .Child(UrlUsuarios)
                 .OrderByKey()
-                .EqualTo(key)
-                .OnceAsync<Post>();
-            Post post = new Post();
-            if (data != null)
-            {
-                foreach (var aux in data)
-                post = new Post(aux);
-            }
-            return post;
+                .EqualTo(Post.Key)
+                .OnceSingleAsync<Post>();
+
+            if (data == null) { Post.Key = null; } 
+            else { Post.Object = data;  }
+
+            return Post;
         }
-        public async Task Create(Post post)
+        public async Task Create()
         {
-            post.Id = null;
-            var x = await Db.Create(post.ReturnSmallPost(), 
-                Url.RootInOneEspacio(post.Espacio));
+            var x = await Db.Create(Post.Object.ReturnSmallPost(), 
+               UrlEspacios);
             if (x.Key != null)
             { 
-                await Db.Update(post.ReturnSmallPost(),
-                    Url.AddKey(Url.AddKey(Url.Usuarios, post.Usuario.Id), x.Key));
+                await Db.Update(Post.Object.ReturnSmallPost(),
+                    Url.AddKey(UrlUsuarios, Post.Key));
             }    
         }
-        public async Task Update(Post post)
+        public async Task Update()
         {
-            string Key = post.Id;
-            post.Id = null;
-            await Db.Update(post.ReturnSmallPost(), 
-                Url.AddKey(Url.RootInOneEspacio(post.Espacio),Key));
-            await Db.Update(post.ReturnSmallPost(),
-                Url.AddKey(Url.AddKey(Url.Usuarios, post.Usuario.Id), Key));
+            await Db.Update(Post.Object.ReturnSmallPost(), 
+                Url.AddKey(UrlEspacios,Post.Key));
+            await Db.Update(Post.Object.ReturnSmallPost(),
+                Url.AddKey(UrlUsuarios, Post.Key));
         }
-        public async Task Delete(Post post)
+        public async Task Delete()
         {
-            await Db.Delete(
-                Url.AddKey(
-                    Url.RootInOneEspacio(
-                        post.Espacio), post.Id));
-            await Db.Delete(Url.AddKey(Url.AddKey(Url.Usuarios, post.Usuario.Id), post.Id));
+            await Db.Delete(Url.AddKey(UrlEspacios, Post.Key));
+            await Db.Delete(Url.AddKey(UrlUsuarios, Post.Key));
         }
     }
 }

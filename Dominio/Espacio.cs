@@ -9,26 +9,26 @@ namespace Dominio
 {
     public class Espacio
     {
-        public string Id { get; set; }
         public string UrlEspacio { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
-        public List<Usuario> Miembros { get;set; }
-        public List<Usuario> Administradores { get; set; }
+        public IDictionary<string, Usuario> Miembros { get; set; } = new Dictionary<string, Usuario>();
+        public IDictionary<string, Usuario> Administradores { get; set; } = new Dictionary<string, Usuario>();
         public string Date { get; set; }
         public bool Deleted { get; set; }
 
-        public string GetUrlEspacio()
-        {
-            string UrlEspacioFull = "Espacios";
-            if (UrlEspacio != null){ UrlEspacioFull = UrlEspacioFull + "/" + UrlEspacio; }
-            UrlEspacioFull = UrlEspacioFull + "/" + Id;
-            return UrlEspacioFull;
-        }
         public Espacio() { }
+        public Espacio(Espacio espacio) {
+            Nombre = espacio.Nombre;
+            Descripcion = espacio.Descripcion;
+            UrlEspacio = espacio.UrlEspacio;
+            Miembros = espacio.Miembros;
+            Administradores = espacio.Administradores;
+            Date = espacio.Date;
+            Deleted = espacio.Deleted;
+        }
         public Espacio(FirebaseObject<Espacio> espacio)
         {
-            Id = espacio.Key;
             Nombre = espacio.Object.Nombre;
             Descripcion = espacio.Object.Descripcion;
             UrlEspacio = espacio.Object.UrlEspacio;
@@ -42,7 +42,6 @@ namespace Dominio
         {
             return new Espacio
             {
-                Id = this.Id,
                 UrlEspacio = this.UrlEspacio,
                 Nombre = this.Nombre
             };

@@ -11,72 +11,72 @@ namespace Negocio
 {
     class ComentarioNegocio
     {
-        private FireUrl Url { get; } = new FireUrl("comentarios");
+        private FireUrl Url { get; } = new FireUrl("Comentarios");
         private Db Db { get; } = new Db();
-        private string urlEspacios;
-        private string urlUsuarios;
-        public ComentarioNegocio(Comentario comentario)
+
+        private Go<Comentario> Comentario { get; set; }
+        private string UrlEspacios { get; }
+        private string UrlUsuarios { get; }
+        public ComentarioNegocio(Go<Comentario> comentario)
         {
-            urlUsuarios = Url.AddKey(Url.Usuarios, comentario.Usuario.Id);
-            urlEspacios = Url.RootInOneEspacio(comentario.Post.Espacio);
+            Comentario = new Go<Comentario>(comentario);
+            UrlUsuarios = Url.AddKey(Url.Usuarios, Comentario.Object.Usuario.Key);
+            UrlEspacios = Url.RootInOneEspacio(Comentario.Object.Post.Object.Espacio);
         }
         
-        public async Task<List<Comentario>> GetAllFrom(Comentario comentario, int opcion)
+        public async Task<IDictionary<string, Comentario>> GetAllFrom(int opcion)
         {
             string url = "";
-            if (opcion == 1) { url = urlEspacios; }
-            if (opcion == 2) { url = urlUsuarios; }
+            if (opcion == 1) { url = UrlEspacios; }
+            if (opcion == 2) { url = UrlUsuarios; }
             var data = await Db.Client()
                 .Child(url)
                 .OnceAsync<Comentario>();
-            List<Comentario> comentarios = new List<Comentario>();
+            IDictionary<string, Comentario> comentarios = new Dictionary<string, Comentario>();
             foreach (FirebaseObject<Comentario> aux in data)
             {
-                comentarios.Add(new Comentario(aux));
+                comentarios.Add(aux.Key, aux.Object);
             }
             return comentarios;
         }
-
-        public async Task<Comentario> GetObjectFrom(Comentario comentario, int opcion)
+        public async Task<Go<Comentario>> GetObjectFrom(int opcion)
         {
             string url = "";
-            if (opcion == 1) { url = urlEspacios; }
-            if (opcion == 2) { url = urlUsuarios; }
+            if (opcion == 1) { url = UrlEspacios; }
+            if (opcion == 2) { url = UrlUsuarios; }
+
             var x = await Db.Client()
                 .Child(url)
                 .OrderByKey()
-                .EqualTo(comentario.Id)
+                .EqualTo(Comentario.Key)
                 .OnceSingleAsync<Comentario>();
 
-            if (x != null)
+            if (x == null)
             {
-                x.Id = comentario.Id;
+                Comentario.Key = null;
             }
-            return x;
+            return Comentario;
         }
-       
-        public async Task Create(Comentario comentario)
+        public async Task Create()
         {
-            comentario.Id = null;
-            var x = await Db.Create(comentario.ReturnSmallComentario(),urlEspacios); ;
+            Comentario.Key = null;
+            var x = await Db.Create(Comentario.Object.ReturnSmallComentario(),UrlEspacios); ;
             if (x.Key != null)
             {
-                await Db.Update(comentario.ReturnSmallComentario(),Url.AddKey(urlUsuarios, x.Key));
+                await Db.Update(Comentario.Object.ReturnSmallComentario(),Url.AddKey(UrlUsuarios, Comentario.Key));
             }
         }
-        public async Task Update(Comentario comentario)
+        public async Task Update()
         {
-            string Key = comentario.Id;
-            comentario.Id = null;
-            await Db.Update(comentario.ReturnSmallComentario(),
-                Url.AddKey(urlEspacios, Key));
-            await Db.Update(comentario.ReturnSmallComentario(),
-                Url.AddKey(urlUsuarios, Key));
+            await Db.Update(Comentario.Object.ReturnSmallComentario(),
+                Url.AddKey(UrlEspacios, Comentario.Key));
+            await Db.Update(Comentario.Object.ReturnSmallComentario(),
+                Url.AddKey(UrlUsuarios, Comentario.Key));
         }
-        public async Task Delete(Comentario comentario)
+        public async Task Delete()
         {
-            await Db.Delete(Url.AddKey(urlEspacios, comentario.Id));
-            await Db.Delete(Url.AddKey(urlUsuarios, comentario.Id));
+            await Db.Delete(Url.AddKey(UrlEspacios, Comentario.Key));
+            await Db.Delete(Url.AddKey(UrlUsuarios, Comentario.Key));
         }
     }
 }

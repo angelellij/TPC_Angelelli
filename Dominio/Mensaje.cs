@@ -9,9 +9,8 @@ namespace Dominio
 {
     public class Mensaje
     {
-        public string Id { get; set; }
-        public Usuario Emisor { get; set; }
-        public Usuario Receptor { get; set; }
+        public Go<Usuario> Emisor { get; set; }
+        public Go<Usuario> Receptor { get; set; }
         public string Texto { get; set; }
         public string Date { get; set; }
         public bool Deleted { get; set; }
@@ -20,10 +19,9 @@ namespace Dominio
 
         public Mensaje(FirebaseObject<Mensaje> Mensaje)
         {
-            Id = Mensaje.Key;
-            Emisor = new Usuario();
+            Emisor = new Go<Usuario>();
             Emisor = Mensaje.Object.Emisor;
-            Receptor = new Usuario();
+            Receptor = new Go<Usuario>(Mensaje.Object.Receptor.Key,Mensaje.Object.Receptor.Object);
             Receptor = Mensaje.Object.Receptor;
             Texto = Mensaje.Object.Texto;
             Date = Mensaje.Object.Date;
@@ -34,7 +32,6 @@ namespace Dominio
         {
             return new Mensaje
             {
-                Id = Id,
                 Texto = Texto,
                 Date = Date,
                 Deleted = Deleted

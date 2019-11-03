@@ -13,34 +13,34 @@ namespace WebAPI.Controllers
     public class UsuariosController : ApiController
     {
         // GET: api/Usuarios
-        public async Task<List<Usuario>> Get()
+        public async Task<IDictionary<string, Usuario>> Get()
         {
            return await new UsuarioNegocio().GetAll();
         }
 
         // GET: api/Usuarios/5
-        public async Task<Usuario> Get(string id)
+        public async Task<Go<Usuario>> Get(string id)
         {
-            return await new UsuarioNegocio().GetObject(id);
+            return await new UsuarioNegocio(new Go<Usuario>(id)).GetObject();
         }
 
         // POST: api/Usuarios
         public async Task Post([FromBody]Usuario usuario)
         {
-            await new UsuarioNegocio().Create(usuario); 
+            await new UsuarioNegocio(new Go<Usuario>(usuario)).Create(); 
 
         }
 
         // PUT: api/Usuarios/5
-        public async Task Put(string id, [FromBody]Usuario value)
+        public async Task Put([FromBody]Usuario usuario, string id)
         {
-            await new UsuarioNegocio().Update(id,value);
+            await new UsuarioNegocio(new Go<Usuario>(id, usuario)).Update();
         }
 
         // DELETE: api/Usuarios/5
         public async Task Delete(string id)
         {
-            await new UsuarioNegocio().Delete(id);
+            await new UsuarioNegocio(new Go<Usuario>(id)).Delete();
         }
     }
 }

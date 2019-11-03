@@ -9,12 +9,11 @@ namespace Dominio
 {
     public class Post
     {
-        public string Id { get; set; }
-        public Espacio Espacio { get; set; }
-        public Usuario Usuario { get; set; }
+        public Go<Espacio> Espacio { get; set; }
+        public Go<Usuario> Usuario { get; set; }
         public string Titulo { get; set; }
         public string Descripcion { get; set; }
-        public Tag Tag { get; set; }
+        public Go<Tag> Tag { get; set; }
         public string Date { get; set; }
         public bool Deleted { get; set; }
 
@@ -22,31 +21,27 @@ namespace Dominio
 
         public Post(FirebaseObject<Post> Post)
         {
-            Id = Post.Key;
-            Espacio = new Espacio();
-            Espacio = Post.Object.Espacio;
-            Usuario = new Usuario();
-            Usuario = Post.Object.Usuario;
+           
             Titulo = Post.Object.Titulo;
             Descripcion = Post.Object.Descripcion;
-            Tag = new Tag();
-            Tag = Post.Object.Tag;
             Date = Post.Object.Date;
             Deleted = Post.Object.Deleted;
+            Espacio = new Go<Espacio>(Espacio);
+            Usuario = new Go<Usuario>(Usuario);
+            Tag = new Go<Tag>(Tag);
         }
 
         public Post ReturnSmallPost()
         {
-            return new Post
+           return new Post
             {
-                Id = Id,
                 Titulo = Titulo,
                 Descripcion = Descripcion,
-                Tag = Tag,
                 Date = Date,
                 Deleted = Deleted,
-                Espacio = Espacio.ReturnSmallEspacio(),
-                Usuario = Usuario.ReturnSmallUsuario()
+                Espacio = new Go<Espacio>(Espacio.Key, Espacio.Object.ReturnSmallEspacio()),
+                Tag = new Go<Tag> (Tag),
+                Usuario = new Go<Usuario>(Usuario.Key, Usuario.Object.ReturnSmallUsuario())     
             };
         }
     }

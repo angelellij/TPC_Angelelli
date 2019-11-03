@@ -14,33 +14,37 @@ namespace WebAPI.Controllers
     public class TagsController : ApiController
     {
         // GET: api/Tags
-        public Task<List<Tag>> GetAll()
-        {
-            return new TagNegocio().GetAll();
+        public Task<IDictionary<string, Tag>> GetAll([FromBody]Espacio espacio)
+        { 
+            Go<Tag> tag = new Go<Tag>();
+            tag.Object.Espacio = new Go<Espacio>(espacio);
+            return new TagNegocio(tag).GetAllFromEspacios();
         }
 
         // GET: api/Tags/stringId
-        public Task<Tag> Get(string id)
+        public Task<Go<Tag>> Get([FromBody]Espacio espacio, string id)
         {
-            return new TagNegocio().GetObject(id);
+            Go<Tag> tag = new Go<Tag>(id);
+            tag.Object.Espacio = new Go<Espacio>(espacio);
+            return new TagNegocio(tag).GetObject();
         }
 
         // POST: api/Tags
-        public async void Post([FromBody]Tag value)
+        public async void Post([FromBody]Tag tag)
         {
-              await new TagNegocio().Create(value);
+            await new TagNegocio(new Go<Tag>(tag)).Create();
         }
 
         // PUT: api/Tags/stringId
-        public async void Put(string id, [FromBody]Tag tag)
+        public async void Put([FromBody]Tag tag, string id)
         {
-            await new TagNegocio().Update(id, tag);
+            await new TagNegocio(new Go<Tag>(id,tag)).Update();
         }
 
         // DELETE: api/Tags/stringId
-        public async void Delete(string value)
+        public async void Delete([FromBody]string id)
         {
-            await new TagNegocio().Delete(value);
+            await new TagNegocio(new Go<Tag>(id)).Delete();
         }
     }
 }

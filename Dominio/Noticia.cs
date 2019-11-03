@@ -9,9 +9,8 @@ namespace Dominio
 {
     public class Noticia
     {
-        public string Id { get; set; }
-        public Espacio Espacio { get; set; }
-        public Usuario Usuario { get; set; }
+        public Go<Espacio> Espacio { get; set; }
+        public Go<Usuario> Usuario { get; set; }
         public string Titulo { get; set; }
         public string Descripcion { get; set; }
         public string Date { get; set; }
@@ -20,26 +19,25 @@ namespace Dominio
         public Noticia() { }
         public Noticia(FirebaseObject<Noticia> noticia)
         {
-            Id = noticia.Key;
             Titulo = noticia.Object.Titulo;
             Descripcion = noticia.Object.Descripcion;
             Date = noticia.Object.Date;
             Deleted = noticia.Object.Deleted;
-            Usuario = noticia.Object.Usuario;
-            Espacio = noticia.Object.Espacio;
+            Usuario = new Go<Usuario>(noticia.Object.Usuario);
+            Espacio = new Go<Espacio>(noticia.Object.Espacio);
         }
 
         public Noticia ReturnNoticiaFire()
         {
             Noticia NoticiaFire = new Noticia
             {
-                Id = Id,
                 Titulo = Titulo,
                 Descripcion = Descripcion,
                 Date = Date,
                 Deleted = Deleted,
-                Usuario = Usuario.ReturnSmallUsuario()
-        };
+                Usuario = new Go<Usuario>(Usuario.Key, Usuario.Object.ReturnSmallUsuario()),
+                Espacio = new Go<Espacio>(Espacio.Key, Espacio.Object.ReturnSmallEspacio()),
+            };
             return NoticiaFire;
         }
     }

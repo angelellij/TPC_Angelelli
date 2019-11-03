@@ -10,7 +10,7 @@ namespace Dominio
     public class Tag
     {
         public string Id { get; set; }
-        public Espacio Espacio { get; set; }
+        public Go<Espacio> Espacio { get; set; }
         public string Nombre { get; set; }
         public string ColorLetra { get; set; }
         public string ColorBackground { get; set; }
@@ -19,7 +19,7 @@ namespace Dominio
         {
                 Id = tag.Key;
                 Nombre = tag.Object.Nombre;
-                Espacio = tag.Object.Espacio;
+                Espacio = new Go<Espacio>(tag.Object.Espacio);
                 ColorLetra = tag.Object.ColorLetra;
                 ColorBackground = tag.Object.ColorBackground;
         }
@@ -30,7 +30,7 @@ namespace Dominio
             {
                 Id = Id,
                 Nombre = Nombre,
-                Espacio = Espacio.ReturnSmallEspacio()       
+                Espacio = new Go<Espacio>(Espacio.Key, Espacio.Object.ReturnSmallEspacio())       
             };
         }
     }

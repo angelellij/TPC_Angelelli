@@ -9,9 +9,8 @@ namespace Dominio
 {
     public class Comentario
     {
-        public string Id { get; set; }
-        public Post Post { get; set; }
-        public Usuario Usuario { get; set; }
+        public Go<Post> Post { get; set; }
+        public Go<Usuario> Usuario { get; set; }
         public string Texto { get; set; }
         public string Date { get; set; }
         public bool Deleted { get; set; }
@@ -20,10 +19,9 @@ namespace Dominio
 
         public Comentario(FirebaseObject<Comentario> Comentario)
         {
-            Id = Comentario.Key;
-            Post = new Post();
+            Post = new Go<Post>();
             Post = Comentario.Object.Post;
-            Usuario = new Usuario();
+            Usuario = new Go<Usuario>();
             Usuario = Comentario.Object.Usuario;
             Texto = Comentario.Object.Texto;
             Date = Comentario.Object.Date;
@@ -32,14 +30,13 @@ namespace Dominio
 
         public Comentario ReturnSmallComentario()
         {
-            return new Comentario
+            return new Comentario()
             {
-                Id = Id,
                 Texto = Texto,
                 Date = Date,
                 Deleted = Deleted,
-                Post = Post.ReturnSmallPost(),
-                Usuario = Usuario.ReturnSmallUsuario()
+                Post = Post,
+                Usuario = Usuario
             };
         }
     }
