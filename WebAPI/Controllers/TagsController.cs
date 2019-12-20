@@ -8,19 +8,21 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace WebAPI.Controllers
 {
     public class TagsController : ApiController
     {
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         // GET: api/Tags
-        public Task<IDictionary<string, Tag>> GetAll([FromBody]Espacio espacio)
-        { 
-            Go<Tag> tag = new Go<Tag>();
-            tag.Object.Espacio = new Go<Espacio>(espacio);
-            return new TagNegocio(tag).GetAllFromEspacios();
+        public Task<List<Go<Tag>>> GetAll(string espacioUrl)
+        {
+            espacioUrl = espacioUrl.Replace("--", "/-");
+            return new TagNegocio().GetAllFromEspacios(espacioUrl);
         }
 
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         // GET: api/Tags/stringId
         public Task<Go<Tag>> Get([FromBody]Espacio espacio, string id)
         {
@@ -29,22 +31,25 @@ namespace WebAPI.Controllers
             return new TagNegocio(tag).GetObject();
         }
 
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         // POST: api/Tags
-        public async void Post([FromBody]Tag tag)
+        public async Task<Go<Tag>> Post([FromBody]Tag tag)
         {
-            await new TagNegocio(new Go<Tag>(tag)).Create();
+           return await new TagNegocio(new Go<Tag>(tag)).Create();
         }
 
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         // PUT: api/Tags/stringId
-        public async void Put([FromBody]Tag tag, string id)
+        public async Task<Go<Tag>> Put([FromBody]Go<Tag> tag)
         {
-            await new TagNegocio(new Go<Tag>(id,tag)).Update();
+           return await new TagNegocio(tag).Update();
         }
 
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         // DELETE: api/Tags/stringId
-        public async void Delete([FromBody]string id)
+        public async Task<Go<Tag>> Delete(string url)
         {
-            await new TagNegocio(new Go<Tag>(id)).Delete();
+            return await new TagNegocio().Delete(url);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Collections;
 using Dominio;
 using Negocio;
@@ -14,31 +15,46 @@ namespace WebAPI.Controllers
     public class EspaciosController : ApiController
     {
         // GET: api/Tags
-        public async Task<IDictionary<string, Espacio>> GetAll()
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
+        public async Task<List<Go<Espacio>>> GetAll([FromBody]string idUsuario)
         {
-            return await new EspacioNegocio().GetAll();
+            return await new EspacioNegocio().GetAllFromUsuario(idUsuario);
         }
 
         // GET: api/Tags/stringId
-        public async Task<Go<Espacio>> Get(string id)
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
+        public async Task<List<Go<Espacio>>> Get(string id)
         {
-            return await new EspacioNegocio(new Go<Espacio>(id)).GetObject();
+            if (id.Contains("usuario"))
+            {
+                id = id.Replace("usuario", "");
+                return await new EspacioNegocio().GetAllFromUsuario(id);
+            }
+            else
+            {
+                List<Go<Espacio>> espacioD = new List<Go<Espacio>>();
+                espacioD.Add(await new EspacioNegocio(new Go<Espacio>(id)).GetObject());
+                return espacioD;
+            }  
         }
 
         // POST: api/Tags
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         public async Task Post([FromBody]Espacio Espacio)
         {
             await new EspacioNegocio(new Go<Espacio>(Espacio)).Create();
         }
 
         // PUT: api/Tags/stringId
-        public async void Put(string id, [FromBody]Espacio Espacio)
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
+        public async Task Put([FromBody]Go<Espacio> Espacio)
         {
-            await new EspacioNegocio(new Go<Espacio>(id,Espacio)).Update();
+            await new EspacioNegocio(Espacio).Update();
         }
 
         // DELETE: api/Tags/stringId
-        public async void Delete(string id)
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
+        public async Task Delete(string id)
         {
             await new EspacioNegocio(new Go<Espacio>(id)).Delete();
         }

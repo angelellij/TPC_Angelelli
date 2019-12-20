@@ -43,7 +43,8 @@ namespace Dominio
             return new Espacio
             {
                 UrlEspacio = this.UrlEspacio,
-                Nombre = this.Nombre
+                Nombre = this.Nombre,
+                Descripcion = this.Descripcion
             };
         }
     }

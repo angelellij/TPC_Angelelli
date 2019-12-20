@@ -22,16 +22,16 @@ namespace Negocio
         {
             Mensaje = new Go<Mensaje>(mensaje);
             UrlEmisor = Url.AddKey(Url.Usuarios,
-                            Url.AddKey(Mensaje.Object.Emisor.Key,
+                            Url.AddKey(Mensaje.Object.Emisor,
                                 Url.AddKey(Url.Root,
-                                    Mensaje.Object.Receptor.Key)));
+                                    Mensaje.Object.Receptor)));
             UrlReceptor = Url.AddKey(Url.Usuarios,
-                            Url.AddKey(Mensaje.Object.Receptor.Key,
+                            Url.AddKey(Mensaje.Object.Receptor,
                                 Url.AddKey(Url.Root,
-                                    Mensaje.Object.Emisor.Key)));
+                                    Mensaje.Object.Emisor)));
         }
 
-        public async Task<IDictionary<string, Mensaje>> GetAllFrom(int opcion)
+        public async Task<List<Go<Mensaje>>> GetAllFrom(int opcion)
         {
             string url = "";
             if (opcion == 1) { url = UrlEmisor; }
@@ -40,11 +40,11 @@ namespace Negocio
                 .Child(url)
                 .OnceAsync<Mensaje>();
 
-            IDictionary<string, Mensaje> Mensajes = new Dictionary<string, Mensaje>();
+            List<Go<Mensaje>> Mensajes = new List<Go<Mensaje>>();
 
             foreach (var aux in data)
             {
-                Mensajes.Add(aux.Key, aux.Object);
+                Mensajes.Add(new Go<Mensaje>(aux));
             }
             return Mensajes;
         }

@@ -33,16 +33,20 @@ namespace Dominio
 
         public Post ReturnSmallPost()
         {
-           return new Post
+           Post x = new Post
             {
                 Titulo = Titulo,
                 Descripcion = Descripcion,
                 Date = Date,
                 Deleted = Deleted,
                 Espacio = new Go<Espacio>(Espacio.Key, Espacio.Object.ReturnSmallEspacio()),
-                Tag = new Go<Tag> (Tag),
                 Usuario = new Go<Usuario>(Usuario.Key, Usuario.Object.ReturnSmallUsuario())     
             };
+            if (this.Tag != null)
+            {
+                x.Tag = this.Tag;
+            }
+            return x;
         }
     }
 }

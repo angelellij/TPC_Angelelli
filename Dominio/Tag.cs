@@ -9,7 +9,6 @@ namespace Dominio
 {
     public class Tag
     {
-        public string Id { get; set; }
         public Go<Espacio> Espacio { get; set; }
         public string Nombre { get; set; }
         public string ColorLetra { get; set; }
@@ -17,7 +16,6 @@ namespace Dominio
         public Tag() { }
         public Tag(FirebaseObject<Tag> tag)
         {
-                Id = tag.Key;
                 Nombre = tag.Object.Nombre;
                 Espacio = new Go<Espacio>(tag.Object.Espacio);
                 ColorLetra = tag.Object.ColorLetra;
@@ -28,10 +26,10 @@ namespace Dominio
         {
             return new Tag
             {
-                Id = Id,
                 Nombre = Nombre,
-                Espacio = new Go<Espacio>(Espacio.Key, Espacio.Object.ReturnSmallEspacio())       
-            };
+                ColorLetra = ColorLetra,
+                ColorBackground = ColorBackground
+        };
         }
     }
 }

@@ -17,33 +17,41 @@ namespace Negocio
         private string UrlUsuarios { get; } = "";
         private Go<Post> Post { get; }
 
+        public PostNegocio()
+        {
+        }
+
         public PostNegocio(Go<Post> post)
         {
             Post = new Go<Post>(post);
             UrlEspacios = Url.RootInOneEspacio(Post.Object.Espacio);
             UrlUsuarios = Url.AddKey(Url.Usuarios, Post.Object.Usuario.Key);
         }
-        public async Task<IDictionary<string, Post>> GetAllFromEspacio()
+        public async Task<List<Go<Post>>> GetAllFromEspacio(string urlEspacio)
         {
+            string url = Url.AddKey(Url.Espacios,
+                            Url.AddKey(urlEspacio,
+                                Url.Root));
             var data = await Db.Client()
-                .Child(UrlEspacios)
+                .Child(url)
                 .OnceAsync<Post>();
-            IDictionary<string, Post> posts = new Dictionary<string, Post>();
+
+            List<Go<Post>> posts = new List<Go<Post>>();
             foreach (FirebaseObject<Post> aux in data)
             {
-                posts.Add(aux.Key, aux.Object);
+                posts.Add(new Go<Post>(aux));
             }
             return posts;
         }
-        public async Task<List<Post>> GetAllFromUsuario()
+        public async Task<List<Go<Post>>> GetAllFromUsuario()
         {
             var data = await Db.Client()
                 .Child(UrlUsuarios)
                 .OnceAsync<Post>();
-            List<Post> posts = new List<Post>();
+            List<Go<Post>> posts = new List<Go<Post>>();
             foreach (FirebaseObject<Post> aux in data)
             {
-                posts.Add(new Post(aux));
+                posts.Add(new Go<Post>(aux));
             }
             return posts;
         }
@@ -71,15 +79,14 @@ namespace Negocio
 
             return Post;
         }
-        public async Task Create()
+        public async Task<Go<Post>> Create(Post post)
         {
-            var x = await Db.Create(Post.Object.ReturnSmallPost(), 
-               UrlEspacios);
-            if (x.Key != null)
-            { 
-                await Db.Update(Post.Object.ReturnSmallPost(),
-                    Url.AddKey(UrlUsuarios, Post.Key));
-            }    
+            string url = Url.AddKey(Url.Espacios,
+                            Url.AddKey(post.Espacio.Object.UrlEspacio,
+                                Url.AddKey(post.Espacio.Key,
+                                    Url.Root)));
+            await Db.Create(post.ReturnSmallPost(),url);
+            return new Go<Post>(post);
         }
         public async Task Update()
         {

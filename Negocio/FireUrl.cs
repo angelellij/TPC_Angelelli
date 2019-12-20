@@ -24,12 +24,16 @@ namespace Negocio
 
         public string GetUrlFromList(List<string> Keys)
         {
-            string url = Keys[0];
+            string url;
+            if (Keys.Count != 0) { 
+            url = Keys[0];
             for (int i = 1; i < Keys.Count(); i++)
             {
                 url = url + "/" + Keys[i];
             }
-//            url = url.Replace("-","");
+                //            url = url.Replace("-","");
+            }
+            else { url = ""; }
             return url;
         }
 

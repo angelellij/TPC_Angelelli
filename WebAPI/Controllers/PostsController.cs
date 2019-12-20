@@ -6,54 +6,34 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using Negocio;
 
 namespace WebAPI.Controllers
 {
     public class PostsController : ApiController
     {
-        [Route("~/api/posts/espacios/")]
-        public async Task<IDictionary<string, Post>> Get([FromBody]Go<Espacio> espacio)
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
+        public async Task<List<Go<Post>>> Get(string espacioUrl)
         {
-            Go<Post> Post = new Go<Post>();
-            Post.Object.Espacio = new Go<Espacio>(espacio);
-            return await new PostNegocio(Post).GetAllFromEspacio();
+            espacioUrl = espacioUrl.Replace("--", "/-");
+            return await new PostNegocio().GetAllFromEspacio(espacioUrl);
         }
-        [Route("~/api/posts/usuarios/")]
-        public async Task<List<Post>> Get([FromBody]Go<Usuario> usuario)
-        {
-            Go<Post> Post = new Go<Post>();
-            Post.Object.Usuario = new Go<Usuario>(usuario);
-            return await new PostNegocio(Post).GetAllFromUsuario();
-        }
-        [Route("~/api/posts/espacios/{id}")]
-        public async Task<Go<Post>> Get(string id, [FromBody]Espacio espacio)
-        {
-            Go<Post> Post = new Go<Post>(id);
-            Post.Object.Espacio = new Go<Espacio>(espacio);
-            return await new PostNegocio(Post).GetObjectFromEspacio();
-        }
+        
 
-        [Route("~/api/posts/usuarios/{id}")]
-        public async Task<Go<Post>> Get(string id,[FromBody]Usuario usuario)
-        {
-            Go<Post> Post = new Go<Post>();
-            Post.Object.Usuario = new Go<Usuario>(usuario);
-            return await new PostNegocio(Post).GetObjectFromUsuario();
-        }
-
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         // POST: api/Post
-        public async Task Post([FromBody]Post post)
+        public async Task<Go<Post>> Post([FromBody]Post post)
         {
-            await new PostNegocio(new Go<Post>(post)).Create();
+            return await new PostNegocio().Create(post);
         }
-
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         // PUT: api/Post/5
         public async Task Put([FromBody]Post post, string id)
         {
             await new PostNegocio(new Go<Post>(id, post)).Update();
         }
-
+        [EnableCors(origins: "http://localhost:4200", headers: "*", methods: "*", SupportsCredentials = true)]
         // DELETE: api/Post/5
         public async Task Delete([FromBody]string id)
         {

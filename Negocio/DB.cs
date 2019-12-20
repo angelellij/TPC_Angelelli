@@ -57,7 +57,7 @@ namespace Negocio
         {
             await Client()
             .Child(url)
-            .PutAsync(obj);
+            .PatchAsync(obj);
         }
 
         public async Task Delete(string url)

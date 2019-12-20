@@ -9,7 +9,6 @@ namespace Dominio
 {
     public class Noticia
     {
-        public Go<Espacio> Espacio { get; set; }
         public Go<Usuario> Usuario { get; set; }
         public string Titulo { get; set; }
         public string Descripcion { get; set; }
@@ -24,21 +23,18 @@ namespace Dominio
             Date = noticia.Object.Date;
             Deleted = noticia.Object.Deleted;
             Usuario = new Go<Usuario>(noticia.Object.Usuario);
-            Espacio = new Go<Espacio>(noticia.Object.Espacio);
         }
 
-        public Noticia ReturnNoticiaFire()
+        public Noticia ReturnSmallNoticia()
         {
-            Noticia NoticiaFire = new Noticia
+           return new Noticia
             {
                 Titulo = Titulo,
                 Descripcion = Descripcion,
                 Date = Date,
                 Deleted = Deleted,
-                Usuario = new Go<Usuario>(Usuario.Key, Usuario.Object.ReturnSmallUsuario()),
-                Espacio = new Go<Espacio>(Espacio.Key, Espacio.Object.ReturnSmallEspacio()),
+                Usuario = new Go<Usuario>(Usuario.Key, Usuario.Object.ReturnSmallUsuario())
             };
-            return NoticiaFire;
         }
     }
 }

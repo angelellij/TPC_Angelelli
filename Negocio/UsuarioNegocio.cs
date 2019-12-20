@@ -15,7 +15,7 @@ namespace Negocio
         private FireUrl Url { get; set; } = new FireUrl("Usuarios");
         private Db Db { get; } = new Db();
 
-        private Go<Usuario> Usuario { get; }
+        private Go<Usuario> Usuario { get; set; }
         private List<string> UrlEspaciosAdministrador { get; } = new List<string>();
         private List<string> UrlEspaciosMiembro { get; } = new List<string>();
         private List<string> UrlEspacios { get; } = new List<string>();
@@ -64,19 +64,40 @@ namespace Negocio
                         AuthTokenAsyncFactory = () => Task.FromResult(auth.FirebaseToken)
                     });
             Usuario.Key = auth.User.LocalId;
+            AuthProvider.Dispose();
             firebase.Dispose();
         }
 
-        public async Task<IDictionary<string, Usuario>> GetAll()
+        public async Task<Go<Usuario>> Login()
         {
-            IDictionary<string, Usuario> Usuarios = new Dictionary<string, Usuario>();
+            var AuthProvider = new FirebaseAuthProvider(new FirebaseConfig(Db.ApiKey));
+            FirebaseAuthLink auth = await AuthProvider
+                .SignInWithEmailAndPasswordAsync(
+                    Usuario.Object.Email,
+                    Usuario.Object.Contrasena);
+            var firebase = new FirebaseClient(
+                Db.DatabaseURL,
+                new FirebaseOptions
+                {
+                    AuthTokenAsyncFactory = () => Task.FromResult(auth.FirebaseToken)
+                });
+            Usuario.Key = auth.User.LocalId;
+            Usuario = await GetObject();
+            AuthProvider.Dispose();
+            firebase.Dispose();
+            return Usuario;
+        }
+
+        public async Task<List<Go<Usuario>>> GetAll()
+        {
+            List < Go < Usuario >> Usuarios = new List<Go<Usuario>>();
             var data = await Db.Client()
            .Child(Url.Root)
            .OnceAsync<Usuario>();
 
             foreach (var x in data)
             {
-                Usuarios.Add(x.Key, x.Object);
+                Usuarios.Add(new Go<Usuario>(x.Key, x.Object));
             }
             return Usuarios;
         }
@@ -109,10 +130,13 @@ namespace Negocio
            .Child(Url.Root)
            .OrderByKey()
            .EqualTo(Usuario.Key)
-           .OnceSingleAsync<Usuario>();
+           .OnceAsync<Usuario>();
 
-            if (data == null) { Usuario.Key = null; }
-            else { Usuario.Object = data; }
+            foreach(var x in data)
+            {
+                Usuario.Key = x.Key;
+                Usuario.Object = x.Object;
+            }
             return Usuario;
         }
 

@@ -12,39 +12,25 @@ namespace Negocio
     {
         private FireUrl Url { get; } = new FireUrl("Noticias");
         private Db Db { get; } = new Db();
-        private string UrlEspacios { get; } = "";
         private Go<Noticia> Noticia { get; set; }
 
         public NoticiaNegocio() { }
         public NoticiaNegocio(Go<Noticia> noticia)
         {
             Noticia = new Go<Noticia>(noticia);
-            UrlEspacios = Url.AddKey(Url.Espacios,
-                    Url.AddKey(Noticia.Object.Espacio.Key,
-                        Url.Root)
-                    );
         }
 
-        public async Task<IDictionary<string, Noticia>> GetAll()
+        public async Task<List<Go<Noticia>>> GetAll()
         {
-            IDictionary<string, Noticia> noticias = new Dictionary<string, Noticia>();
+            List<Go<Noticia>> noticias = new List<Go<Noticia>>();
 
             var data = await Db.Client()
-              .Child(Url.Espacios)
-              .OnceAsync<Espacio>();
+              .Child(Url.Root)
+              .OnceAsync<Noticia>();
 
             foreach (var aux in data)
             {
-                var datax = await Db.Client()
-              .Child(Url.AddKey(Url.Espacios,
-                    Url.AddKey(aux.Key,Url.Root)
-                    ))
-              .OnceAsync<Noticia>();
-
-                foreach (var auxx in datax)
-                {
-                    noticias.Add(auxx.Key,auxx.Object);
-                }
+               noticias.Add(new Go<Noticia>(aux));
             }
             return noticias;
         }
@@ -52,7 +38,7 @@ namespace Negocio
         public async Task<Go<Noticia>> GetObject()
         {
             var x = await Db.Client()
-                .Child(UrlEspacios)
+                .Child(Url.Root)
                 .OrderByKey()
                 .EqualTo(Noticia.Key)
                 .OnceSingleAsync<Noticia>();
@@ -63,17 +49,17 @@ namespace Negocio
         }
 
 
-        public async Task Create()
+        public async Task<Go<Noticia>> Create()
         {
-            await Db.Create(Noticia.Object.ReturnNoticiaFire(), UrlEspacios);
+            await Db.Create(Noticia.Object.ReturnSmallNoticia(), Url.Root);
+            return this.Noticia;
         }
 
         public async Task Update()
         {
             await Db.Update(Noticia, 
-                Url.AddKey(Url.Espacios,
-                    Url.AddKey(UrlEspacios,Url.Root)
-                    ));
+                Url.AddKey(Url.Root,
+                    this.Noticia.Key));
         }
 
         public async Task Delete(string url)
